@@ -10,9 +10,9 @@ const { height, width } = Dimensions.get("window");
 export default function Map() {
   const initialRegion = {
     latitude: 55.6761, // Latitude of Copenhagen
-    longitude: 12.5683, // Longitude of Copenhagen
-    latitudeDelta: 4, // Zoom level
-    longitudeDelta: 4, // Zoom level
+    longitude: 10.5683, // Longitude of Copenhagen
+    latitudeDelta: 6, // Zoom level
+    longitudeDelta: 6, // Zoom level
   };
 
   // This hook is used to fetch the locations from the API we where provided from Wash World.
@@ -34,13 +34,8 @@ export default function Map() {
             }}
             title={location.name}
             description={location.address}
-          >
-            <Image
-              source={require("../assets/washworld-marker.png")}
-              style={styles.markerImage}
-              resizeMode="contain"
-            />
-          </Marker>
+            image={require("../assets/washworld-marker.png")}
+          />
         ))}
       </MapView>
     </View>
@@ -54,9 +49,5 @@ const styles = StyleSheet.create({
   map: {
     width: width,
     height: height - 120, // The height of the header is 120px, so we subtract that from the total height
-  },
-  markerImage: {
-    width: 30,
-    height: 30,
   },
 });

@@ -1,8 +1,22 @@
 import { useEffect, useState } from "react";
 import { LocationAPI } from "../APIs/LocationAPI";
 
+type Location = {
+  uid: string;
+  locations_ud: string;
+  name: string;
+  address: string;
+  coordinates: {
+    x: string;
+    y: string;
+  };
+  opening_hours: string;
+  message: string;
+  halls_count: number
+}
+
 export const useLocations = () => {
-  const [locations, setLocations] = useState([]);
+  const [locations, setLocations] = useState<Location[]>([]);
 
   const fetchLocations = async () => {
     try {
