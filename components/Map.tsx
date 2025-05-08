@@ -1,4 +1,11 @@
-import { Dimensions, Image, StyleSheet, TextInput, View } from "react-native";
+import {
+  Dimensions,
+  Image,
+  StyleSheet,
+  TextInput,
+  View,
+  Keyboard,
+} from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { useLocations } from "../hooks/useLocations";
 import { useState } from "react";
@@ -50,6 +57,7 @@ export default function Map() {
         style={styles.map}
         provider={PROVIDER_GOOGLE}
         initialRegion={initialRegion}
+        onPress={() => setSelectedLocation(null)}
       >
         {filteredLocations.map((location, index) => (
           <Marker
@@ -60,8 +68,16 @@ export default function Map() {
             }}
             title=""
             description=""
-            image={require("../assets/washworld-marker.png")}
-            onPress={() => setSelectedLocation(location)}
+            image={
+              selectedLocation?.uid === location.uid
+                ? require("../assets/washworld-marker-selected.png")
+                : require("../assets/washworld-marker.png")
+            }
+            onPress={() => {
+              setSelectedLocation(location);
+              Keyboard.dismiss();
+              setSearch("");
+            }}
             tracksViewChanges={false}
           />
         ))}
@@ -101,5 +117,5 @@ const styles = StyleSheet.create({
   },
   callout: {
     alignItems: "center",
-  }
+  },
 });
