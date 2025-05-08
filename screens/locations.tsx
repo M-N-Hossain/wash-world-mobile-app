@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 import Header from "../components/Header";
 import Map from "../components/Map";
+import MapCallout from "../components/MapCallout";
 
 export default function Locations() {
 
@@ -11,6 +12,7 @@ export default function Locations() {
       <View style={styles.locationContainer}>
         <Map />
       </View>
+      {/* <MapCallout /> */}
     </View>
   );
 }
@@ -19,6 +21,7 @@ const styles = StyleSheet.create({
   screenContainer: {
     width: "100%",
     flex: 1,
+    alignItems: "center",
   },
   locationContainer: {
     flex: 1,

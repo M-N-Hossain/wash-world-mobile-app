@@ -1,6 +1,8 @@
-import { Dimensions, Image, StyleSheet, View } from "react-native";
+import { Dimensions, Image, StyleSheet, TextInput, View } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { useLocations } from "../hooks/useLocations";
+import { useState } from "react";
+import MapCallout from "./MapCallout";
 
 // Using percentage for height and width is not recommended in this case
 // because the map needs to be a fixed size to work properly. Instead, we use Dimensions API to get the window size.
@@ -18,26 +20,61 @@ export default function Map() {
   // This hook is used to fetch the locations from the API we where provided from Wash World.
   const locations = useLocations();
 
+  //Search logic
+  const [search, setSearch] = useState("");
+
+  const filteredLocations = locations.filter((location) => {
+    const lowerCaseSearch = search.toLowerCase();
+    return (
+      location.name.toLowerCase().includes(lowerCaseSearch) ||
+      location.address.toLowerCase().includes(lowerCaseSearch)
+    );
+  });
+
+  // Callout logic
+  const [selectedLocation, setSelectedLocation] = useState<
+    null | (typeof locations)[0]
+  >(null);
+
   return (
     <View style={styles.container}>
+      <View style={styles.searchBar}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search location"
+          value={search}
+          onChangeText={setSearch}
+        />
+      </View>
       <MapView
         style={styles.map}
         provider={PROVIDER_GOOGLE}
         initialRegion={initialRegion}
       >
-        {locations.map((location, index) => (
+        {filteredLocations.map((location, index) => (
           <Marker
             key={index}
             coordinate={{
               latitude: parseFloat(location.coordinates.y),
               longitude: parseFloat(location.coordinates.x),
             }}
-            title={location.name}
-            description={location.address}
+            title=""
+            description=""
             image={require("../assets/washworld-marker.png")}
+            onPress={() => setSelectedLocation(location)}
+            tracksViewChanges={false}
           />
         ))}
       </MapView>
+      {selectedLocation && (
+        <View style={styles.callout}>
+          <MapCallout
+            address={selectedLocation.name}
+            open_hours={selectedLocation.open_hours}
+            name={selectedLocation.address}
+          />
+        </View>
+      )}
     </View>
   );
 }
@@ -48,6 +85,21 @@ const styles = StyleSheet.create({
   },
   map: {
     width: width,
-    height: height - 120, // The height of the header is 120px, so we subtract that from the total height
+    height: height - 210, // The height of the header is 120px and the height of the searchBar is 80, so we subtract that from the total height
   },
+  searchBar: {
+    backgroundColor: "#FFFFFF",
+    height: 90,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  searchInput: {
+    backgroundColor: "#F3F3F3",
+    width: "90%",
+    borderRadius: 18,
+    padding: 20,
+  },
+  callout: {
+    alignItems: "center",
+  }
 });

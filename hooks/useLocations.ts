@@ -10,10 +10,10 @@ type Location = {
     x: string;
     y: string;
   };
-  opening_hours: string;
+  open_hours: string;
   message: string;
-  halls_count: number
-}
+  halls_count: number;
+};
 
 export const useLocations = () => {
   const [locations, setLocations] = useState<Location[]>([]);
