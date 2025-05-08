@@ -4,6 +4,8 @@ type FakeButtonProps = {
   ButtonText: string;
 };
 
+// Fake button component to be used in the map callout
+
 export default function FakeButton({ ButtonText }: FakeButtonProps) {
   return (
     <View style={styles.buttonContainer}>

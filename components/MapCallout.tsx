@@ -8,6 +8,9 @@ type Location = {
   open_hours: string;
 };
 
+// This is a custom callout component for the map marker
+// It displays the location name, address, and opening hours
+
 export default function MapCallout({ name, address, open_hours }: Location) {
   return (
     <View style={styles.CalloutContainer}>

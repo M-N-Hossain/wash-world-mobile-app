@@ -30,6 +30,8 @@ export default function Map() {
   //Search logic
   const [search, setSearch] = useState("");
 
+  // Filter the locations based on the search input
+  // The filter function checks if the search input is included in either the name or address of the location.
   const filteredLocations = locations.filter((location) => {
     const lowerCaseSearch = search.toLowerCase();
     return (
@@ -57,6 +59,7 @@ export default function Map() {
         style={styles.map}
         provider={PROVIDER_GOOGLE}
         initialRegion={initialRegion}
+        // when you press on the map, it will close the callout and set the selected location to null
         onPress={() => setSelectedLocation(null)}
       >
         {filteredLocations.map((location, index) => (
@@ -66,9 +69,11 @@ export default function Map() {
               latitude: parseFloat(location.coordinates.y),
               longitude: parseFloat(location.coordinates.x),
             }}
+            // Setting the title and description to empty strings to prevent the default callout from showing
             title=""
             description=""
             image={
+              // Change image when you select a location
               selectedLocation?.uid === location.uid
                 ? require("../assets/washworld-marker-selected.png")
                 : require("../assets/washworld-marker.png")
@@ -78,6 +83,7 @@ export default function Map() {
               Keyboard.dismiss();
               setSearch("");
             }}
+            // This is used to prevent the marker from re-rendering when the state changes
             tracksViewChanges={false}
           />
         ))}
