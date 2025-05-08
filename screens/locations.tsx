@@ -1,11 +1,15 @@
 import { StyleSheet, Text, View } from "react-native";
 import Header from "../components/Header";
+import Map from "../components/Map";
 
 export default function Locations() {
+
+
   return (
     <View style={styles.screenContainer}>
       <Header />
       <View style={styles.locationContainer}>
+        <Map />
       </View>
     </View>
   );
@@ -21,6 +25,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     width: "100%",
-    backgroundColor: "#000000",
+    // backgroundColor: "#000000",
   },
 });
