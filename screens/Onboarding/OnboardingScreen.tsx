@@ -1,8 +1,8 @@
 import React from "react";
 import Onboarding from "react-native-onboarding-swiper";
-import { View, Text, Image } from "react-native";
+import { Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { Skip, Next, Done } from "./OnboardingButtons";
+import { Skip, Next, Done } from "../../components/OnboardingButtons";
 
 const OnboardingScreen = () => {
   const navigation = useNavigation();
@@ -21,7 +21,7 @@ const OnboardingScreen = () => {
           backgroundColor: "#fff",
           image: (
             <Image
-              source={require("../../../assets/onboarding/onboarding-1.png")}
+              source={require("../../assets/onboarding/onboarding-1.png")}
               style={{ width: "100%", height: 130 }}
               resizeMode="contain"
             />
@@ -34,7 +34,7 @@ const OnboardingScreen = () => {
           backgroundColor: "#fff",
           image: (
             <Image
-              source={require("../../../assets/onboarding/onboarding-2.png")}
+              source={require("../../assets/onboarding/onboarding-2.png")}
               style={{ width: "100%", height: 170 }}
               resizeMode="contain"
             />
@@ -47,7 +47,7 @@ const OnboardingScreen = () => {
           backgroundColor: "#fff",
           image: (
             <Image
-              source={require("../../../assets/onboarding/onboarding-3.png")}
+              source={require("../../assets/onboarding/onboarding-3.png")}
               style={{ width: "100%", height: 180 }}
               resizeMode="contain"
             />
