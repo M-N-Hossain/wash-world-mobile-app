@@ -75,8 +75,8 @@ export default function Map() {
             image={
               // Change image when you select a location
               selectedLocation?.uid === location.uid
-                ? require("../assets/washworld-marker-selected.png")
-                : require("../assets/washworld-marker.png")
+                ? require("../assets/location/washworld-marker-selected.png")
+                : require("../assets/location/washworld-marker.png")
             }
             onPress={() => {
               setSelectedLocation(location);
