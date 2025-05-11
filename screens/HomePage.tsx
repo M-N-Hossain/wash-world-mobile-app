@@ -4,6 +4,7 @@ import Header from "../components/Header";
 import LocationCard from "../components/NearbyWashCard";
 import WashCard from "../components/WashHistoryCard";
 import { ArrowUpRight, MessageCircleHeart } from "lucide-react-native";
+import LiveStatusCard from "../components/LiveStatusCard";
 
 export default function HomePage() {
   return (
@@ -11,6 +12,14 @@ export default function HomePage() {
       <Header />
 
       <ScrollView contentContainerStyle={styles.scrollContainer}>
+        {/* Live Status Card */}
+        <Text style={styles.sectionTitle}>Live Status</Text>
+        <LiveStatusCard 
+          status="Your car is being washed"
+          location="Industrial Park 6, 2750 Ballerup"
+          timer="03:27"
+        />
+
         {/* Nearby Wash World */}
         <Text style={styles.sectionTitle}>Nearby Wash World</Text>
         <LocationCard
@@ -74,7 +83,7 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
     marginBottom: 24,
   },
-    linkButton: {
+  linkButton: {
     flexDirection: "row",
     alignItems: "center",
     gap: 5
