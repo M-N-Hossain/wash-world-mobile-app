@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
   planTitle: {
     fontSize: 18,
     fontWeight: "600",
-    color: "#4CAF50",
+    color: "#06c167",
     paddingTop: 16,
     paddingHorizontal: 16,
   },
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
     color: "#000",
   },
   check: {
-    color: "#4CAF50",
+    color: "#06c167",
   },
   checkDisabled: {
     color: "#ccc",
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
   },
 
   actionRibbon: {
-    backgroundColor: "#4CAF50",
+    backgroundColor: "#06c167",
     paddingVertical: 12,
     paddingHorizontal: 24,
     alignItems: "center",
