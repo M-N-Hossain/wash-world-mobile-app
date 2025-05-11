@@ -33,11 +33,13 @@ import { StyleSheet, View } from "react-native";
 import Locations from "./screens/locations";
 import LoginScreen from "./screens/Auth/Login";
 import RegisterScreen from "./screens/Auth/Register";
+import HomePage from "./screens/HomePage";
 
 export default function App() {
   return (
     <View style={styles.container}>
-      <Locations />
+      {/* < HomePage /> */}
+      <Locations /> 
       {/* <LoginScreen /> */}
       {/* <RegisterScreen /> */}
       <StatusBar style="auto" />
