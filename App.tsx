@@ -38,8 +38,8 @@ import HomePage from "./screens/HomePage";
 export default function App() {
   return (
     <View style={styles.container}>
-      {/* < HomePage /> */}
-      <Locations /> 
+      < HomePage />
+      {/*<Locations />*/} 
       {/* <LoginScreen /> */}
       {/* <RegisterScreen /> */}
       <StatusBar style="auto" />
