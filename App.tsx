@@ -34,15 +34,18 @@ import LoginScreen from "./screens/Auth/Login";
 import RegisterScreen from "./screens/Auth/Register";
 import ProfileScreen from "./screens/Profile/ProfileScreen";
 import MembershipOptionsScreen from "./screens/Profile/MembershipOptionsScreen";
+import HomePage from "./screens/HomePage";
 
 export default function App() {
   return (
     <View style={styles.container}>
       {/* <Locations /> */}
+      < HomePage />
+      {/*<Locations />*/}
       {/* <LoginScreen /> */}
       {/* <RegisterScreen /> */}
       {/* <ProfileScreen /> */}
-      <MembershipOptionsScreen />
+      {/* <MembershipOptionsScreen /> */}
       {/* Uncomment the component you want to display */}
       {/* <OnboardingScreen /> */}
       {/* <NavigationContainer> */}
