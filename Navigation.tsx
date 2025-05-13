@@ -1,9 +1,7 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import {
-  createStaticNavigation,
-  NavigationContainer,
-} from "@react-navigation/native";
+import { NavigationContainer } from "@react-navigation/native";
+import React from "react";
 
 ///////////////////// Screens /////////////////////
 // import LoginScreen from "./screens/Auth/Login";
@@ -13,12 +11,15 @@ import MembershipOptionsScreen from "./screens/Profile/MembershipOptionsScreen";
 import ProfileScreen from "./screens/Profile/ProfileScreen";
 import HomePage from "./screens/HomePage";
 import Locations from "./screens/locations";
+import { House, MapPin, User } from "lucide-react-native";
 
+// This is the type for the Profile stack
 export type ProfileStackParamList = {
   ProfileScreen: undefined;
   MembershipOptionsScreen: undefined;
 };
 
+// This is the type for the Homepage stack
 export type HomepageStackParamList = {
   Homepage: undefined;
   Locations: undefined;
@@ -35,14 +36,14 @@ function ProfileStack() {
         name="ProfileScreen"
         component={ProfileScreen}
         options={{
-            headerShown: false,
+          headerShown: false,
         }}
       />
       <ProfileStackNavigator.Screen
         name="MembershipOptionsScreen"
         component={MembershipOptionsScreen}
         options={{
-            title: "Membership Options",
+          title: "Membership Options",
         }}
       />
     </ProfileStackNavigator.Navigator>
@@ -68,17 +69,42 @@ const Tab = createBottomTabNavigator();
 function BasicTabs() {
   return (
     <Tab.Navigator screenOptions={{ headerShown: false }}>
-      <Tab.Screen name="Home" component={HomepageStack} />
-      <Tab.Screen name="Locations" component={Locations} />
-      <Tab.Screen name="Profile" component={ProfileStack} />
+      <Tab.Screen
+        name="Home"
+        component={HomepageStack}
+        options={{
+          tabBarIcon: () => <House color={"#000000"} />,
+        }}
+      />
+      <Tab.Screen
+        name="Locations"
+        component={Locations}
+        options={{
+          tabBarIcon: () => <MapPin color={"#000000"} />,
+        }}
+      />
+      <Tab.Screen
+        name="Profile"
+        component={ProfileStack}
+        options={{
+          tabBarIcon: () => <User color={"#000000"} />,
+        }}
+      />
     </Tab.Navigator>
   );
 }
 
+// Navigation used for the logged in user
+const BasisNavigation = () => (
+  <NavigationContainer>
+    <BasicTabs />
+  </NavigationContainer>
+);
+
 export default function Navigation() {
   return (
-    <NavigationContainer>
-      <BasicTabs />
-    </NavigationContainer>
+    <>
+      <BasisNavigation />
+    </>
   );
 }
