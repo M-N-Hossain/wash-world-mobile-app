@@ -1,8 +1,11 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { createStaticNavigation } from "@react-navigation/native";
+import {
+  createStaticNavigation,
+  NavigationContainer,
+} from "@react-navigation/native";
 
-///////////// Screens /////////////
+///////////////////// Screens /////////////////////
 // import LoginScreen from "./screens/Auth/Login";
 // import RegisterScreen from "./screens/Auth/Register";
 // import OnboardingScreen from "./screens/Onboarding/OnboardingScreen";
@@ -21,36 +24,61 @@ export type HomepageStackParamList = {
   Locations: undefined;
 };
 
-// Screens used in the profile section
-const ProfileStack = createNativeStackNavigator<ProfileStackParamList>({
-  screens: {
-    ProfileScreen: ProfileScreen,
-    MembershipOptionsScreen: MembershipOptionsScreen,
-  },
-});
+// Profile stack
+const ProfileStackNavigator =
+  createNativeStackNavigator<ProfileStackParamList>();
 
-// Screens used in the profile section
-const HomepageStack = createNativeStackNavigator<HomepageStackParamList>({
-  screens: {
-    Homepage: HomePage,
-    Locations: Locations,
-  },
-});
+function ProfileStack() {
+  return (
+    <ProfileStackNavigator.Navigator>
+      <ProfileStackNavigator.Screen
+        name="ProfileScreen"
+        component={ProfileScreen}
+        options={{
+            headerShown: false,
+        }}
+      />
+      <ProfileStackNavigator.Screen
+        name="MembershipOptionsScreen"
+        component={MembershipOptionsScreen}
+        options={{
+            title: "Membership Options",
+        }}
+      />
+    </ProfileStackNavigator.Navigator>
+  );
+}
 
-// The different stacks used in the bottom tab navigator
-const BasicTabs = createBottomTabNavigator({
-  screens: {
-    Home: HomepageStack,
-    Profile: ProfileStack,
-  },
-});
+// Homepage stack
+const HomepageStackNavigator =
+  createNativeStackNavigator<HomepageStackParamList>();
 
-const BasicNavigation = createStaticNavigation(BasicTabs);
+function HomepageStack() {
+  return (
+    <HomepageStackNavigator.Navigator screenOptions={{ headerShown: false }}>
+      <HomepageStackNavigator.Screen name="Homepage" component={HomePage} />
+      <HomepageStackNavigator.Screen name="Locations" component={Locations} />
+    </HomepageStackNavigator.Navigator>
+  );
+}
+
+// Bottom tab navigator
+const Tab = createBottomTabNavigator();
+
+function BasicTabs() {
+  return (
+    <Tab.Navigator screenOptions={{ headerShown: false }}>
+      <Tab.Screen name="Home" component={HomepageStack} />
+      <Tab.Screen name="Locations" component={Locations} />
+      <Tab.Screen name="Profile" component={ProfileStack} />
+    </Tab.Navigator>
+  );
+}
 
 export default function Navigation() {
   return (
-    <>
-      <BasicNavigation />
-    </>
+    <NavigationContainer>
+      <BasicTabs />
+    </NavigationContainer>
   );
 }

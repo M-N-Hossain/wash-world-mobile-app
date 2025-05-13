@@ -14,7 +14,7 @@ export default function MembershipOptionsScreen() {
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.container}>
         {/* Back header stub */}
-        <Text style={styles.back}>{"< Back"}</Text>
+        {/* <Text style={styles.back}>{"< Back"}</Text> */}
 
         {/* Gold Plan */}
         <View style={styles.card}>
