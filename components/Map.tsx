@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
   },
   map: {
     width: width,
-    height: height - 210, // The height of the header is 120px and the height of the searchBar is 80, so we subtract that from the total height
+    height: height - 280, // The height of the header is 120px and the height of the searchBar is 80, so we subtract that from the total height
   },
   searchBar: {
     backgroundColor: "#FFFFFF",

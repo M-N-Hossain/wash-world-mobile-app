@@ -1,9 +1,28 @@
 import React, { useState } from "react";
-import { ScrollView, View, Text, StyleSheet } from "react-native";
+import {
+  ScrollView,
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import ProfileHeader from "../../components/ProfileHeader";
 import ProfileSection from "../../components/ProfileSection";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useNavigation } from "@react-navigation/native";
+import { ProfileStackParamList } from "../../Navigation";
 
 export default function ProfileScreen() {
+  type NavigationProp = NativeStackNavigationProp<
+    ProfileStackParamList,
+    "ProfileScreen"
+  >;
+  const navigation = useNavigation<NavigationProp>();
+
+  const handleMembershipPress = () => {
+    navigation.navigate("MembershipOptionsScreen");
+  };
+
   const [openSection, setOpenSection] = useState<string | null>(null);
 
   const toggleSection = (sectionName: string) => {
@@ -95,9 +114,11 @@ export default function ProfileScreen() {
         </ProfileSection>
       </View>
 
-      <View style={styles.upgradeButton}>
-        <Text style={styles.upgradeText}>Upgrade Membership</Text>
-      </View>
+      <TouchableOpacity onPress={handleMembershipPress}>
+        <View style={styles.upgradeButton}>
+          <Text style={styles.upgradeText}>Upgrade Membership</Text>
+        </View>
+      </TouchableOpacity>
     </ScrollView>
   );
 }
