@@ -1,12 +1,33 @@
 import React from "react";
-import { ScrollView, StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+} from "react-native";
 import Header from "../components/Header";
 import LocationCard from "../components/NearbyWashCard";
 import WashCard from "../components/WashHistoryCard";
 import { ArrowUpRight, MessageCircleHeart } from "lucide-react-native";
 import LiveStatusCard from "../components/LiveStatusCard";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { HomepageStackParamList } from "../Navigation";
+import { useNavigation } from "@react-navigation/native";
 
 export default function HomePage() {
+  type NavigationProp = NativeStackNavigationProp<
+    HomepageStackParamList,
+    "Homepage"
+  >;
+
+  const navigation = useNavigation<NavigationProp>();
+
+  const handleLocationPress = () => {
+    console.log("See all locations pressed");
+    navigation.navigate("Locations");
+  };
+
   return (
     <View style={styles.container}>
       <Header />
@@ -14,7 +35,7 @@ export default function HomePage() {
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         {/* Live Status Card */}
         <Text style={styles.sectionTitle}>Live Status</Text>
-        <LiveStatusCard 
+        <LiveStatusCard
           status="Your car is being washed"
           location="Industrial Park 6, 2750 Ballerup"
           timer="03:27"
@@ -33,7 +54,10 @@ export default function HomePage() {
           distance="0,67km"
         />
         <View style={styles.linkWrapper}>
-          <TouchableOpacity style={styles.linkButton}>
+          <TouchableOpacity
+            style={styles.linkButton}
+            onPress={handleLocationPress}
+          >
             <Text style={styles.linkText}>See all locations</Text>
             <ArrowUpRight color="#777777" size={30} />
           </TouchableOpacity>
@@ -41,13 +65,9 @@ export default function HomePage() {
 
         {/* Last Washes */}
         <Text style={styles.sectionTitle}>Last Washes</Text>
-        <WashCard 
-          name="Wash World Lyngby" 
-          date="April 25th – 2025" />
-        <WashCard 
-          name="Wash World Lyngby" 
-          date="April 25th – 2025" />
-        
+        <WashCard name="Wash World Lyngby" date="April 25th – 2025" />
+        <WashCard name="Wash World Lyngby" date="April 25th – 2025" />
+
         <View style={styles.linkWrapper}>
           <TouchableOpacity style={styles.linkButton}>
             <Text style={styles.linkText}>See full history</Text>
@@ -86,7 +106,7 @@ const styles = StyleSheet.create({
   linkButton: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 5
+    gap: 5,
   },
   linkText: {
     color: "#777777",
