@@ -73,21 +73,21 @@ function BasicTabs() {
         name="Home"
         component={HomepageStack}
         options={{
-          tabBarIcon: () => <House color={"#000000"} />,
+          tabBarIcon: () => <House color={"#666666"} />,
         }}
       />
       <Tab.Screen
         name="Locations"
         component={Locations}
         options={{
-          tabBarIcon: () => <MapPin color={"#000000"} />,
+          tabBarIcon: () => <MapPin color={"#666666"} />,
         }}
       />
       <Tab.Screen
         name="Profile"
         component={ProfileStack}
         options={{
-          tabBarIcon: () => <User color={"#000000"} />,
+          tabBarIcon: () => <User color={"#666666"} />,
         }}
       />
     </Tab.Navigator>
