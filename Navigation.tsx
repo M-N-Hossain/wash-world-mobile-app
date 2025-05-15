@@ -4,9 +4,9 @@ import { NavigationContainer } from "@react-navigation/native";
 import React from "react";
 
 ///////////////////// Screens /////////////////////
-// import LoginScreen from "./screens/Auth/Login";
-// import RegisterScreen from "./screens/Auth/Register";
-// import OnboardingScreen from "./screens/Onboarding/OnboardingScreen";
+import LoginScreen from "./screens/Auth/Login";
+import RegisterScreen from "./screens/Auth/Register";
+import OnboardingScreen from "./screens/Onboarding/OnboardingScreen";
 import MembershipOptionsScreen from "./screens/Profile/MembershipOptionsScreen";
 import ProfileScreen from "./screens/Profile/ProfileScreen";
 import HomePage from "./screens/HomePage";
@@ -24,6 +24,46 @@ export type HomepageStackParamList = {
   Homepage: undefined;
   Locations: undefined;
 };
+
+// This is the type for the Auth stack
+export type AuthStackParamList = {
+  LoginScreen: undefined;
+  RegisterScreen: undefined;
+  OnboardingScreen: undefined;
+};
+
+// Auth stack
+const AuthStackNavigator = createNativeStackNavigator<AuthStackParamList>();
+
+function AuthStack() {
+  return (
+    <AuthStackNavigator.Navigator>
+      {/* <AuthStackNavigator.Screen
+        name="OnboardingScreen"
+        component={OnboardingScreen}
+        options={{
+          headerShown: false,
+        }}
+      /> */}
+      <AuthStackNavigator.Screen
+        name="LoginScreen"
+        component={LoginScreen}
+        options={{
+          title: "Login",
+          headerShown: false,
+        }}
+      />
+      <AuthStackNavigator.Screen
+        name="RegisterScreen"
+        component={RegisterScreen}
+        options={{
+          title: "Register",
+          headerShown: false,
+        }}
+      />
+    </AuthStackNavigator.Navigator>
+  );
+}
 
 // Profile stack
 const ProfileStackNavigator =
@@ -113,10 +153,18 @@ const BasisNavigation = () => (
   </NavigationContainer>
 );
 
+// Navigation used for the logged out users
+const AuthNavigation = () => (
+  <NavigationContainer>
+    <AuthStack />
+  </NavigationContainer>
+);
+
 export default function Navigation() {
   return (
     <>
-      <BasisNavigation />
+      {/* <BasisNavigation /> */}
+      <AuthNavigation />
     </>
   );
 }

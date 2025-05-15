@@ -3,12 +3,12 @@ import { CreateUserDto } from "./CreateUserDto";
 import { UserAPI } from "../APIs/UserAPI";
 import { LoginUserDto } from "./LoginUserDto";
 
-export const signup = createAsyncThunk(
-  "auth/signup",
-  async (createUserDto: CreateUserDto, thunkApi) => {
-    return await UserAPI.signupUser(createUserDto);
-  }
-);
+// export const signup = createAsyncThunk(
+//   "auth/signup",
+//   async (createUserDto: CreateUserDto, thunkApi) => {
+//     return await UserAPI.signupUser(createUserDto);
+//   }
+// );
 
 export const login = createAsyncThunk(
   "auth/login",
