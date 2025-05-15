@@ -68,26 +68,38 @@ const Tab = createBottomTabNavigator();
 
 function BasicTabs() {
   return (
-    <Tab.Navigator screenOptions={{ headerShown: false }}>
+    <Tab.Navigator
+      screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: "#0ac267", // Optional: Controls label color when active
+        tabBarInactiveTintColor: "#666666", // Optional: Controls label color when inactive
+      }}
+    >
       <Tab.Screen
         name="Home"
         component={HomepageStack}
         options={{
-          tabBarIcon: () => <House color={"#666666"} />,
+          tabBarIcon: ({ focused }) => (
+            <House color={focused ? "#0ac267" : "#666666"} />
+          ),
         }}
       />
       <Tab.Screen
         name="Locations"
         component={Locations}
         options={{
-          tabBarIcon: () => <MapPin color={"#666666"} />,
+          tabBarIcon: ({ focused }) => (
+            <MapPin color={focused ? "#0ac267" : "#666666"} />
+          ),
         }}
       />
       <Tab.Screen
         name="Profile"
         component={ProfileStack}
         options={{
-          tabBarIcon: () => <User color={"#666666"} />,
+          tabBarIcon: ({ focused }) => (
+            <User color={focused ? "#0ac267" : "#666666"} />
+          ),
         }}
       />
     </Tab.Navigator>
