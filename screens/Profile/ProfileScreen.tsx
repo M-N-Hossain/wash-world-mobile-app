@@ -30,8 +30,11 @@ export default function ProfileScreen() {
     setOpenSection((prev) => (prev === sectionName ? null : sectionName));
   };
 
+  {/* states for the editable inputs */}
   const [fullName, setFullName] = useState("John Super Doe");
-
+  const [email, setEmail] = useState("johnSuper@doe.com");
+  const [phone, setPhone] = useState("+45 12 34 56 78");
+  const [licensePlate, setLicensePlate] = useState("AD 87 123");
 
   return (
     <ScrollView style={styles.container}>
@@ -42,18 +45,26 @@ export default function ProfileScreen() {
           expanded={openSection === "user"}
           onPress={() => toggleSection("user")}
         >
-          <View style={styles.innerBox}>
-            <EditableField label="Full Name" value={fullName} onSave={setFullName} />
-          </View>
-          <View style={styles.innerBox}>
-            <Text>E-mail: johnSuper@doe.com ✏️</Text>
-          </View>
-          <View style={styles.innerBox}>
-            <Text>Phone number: +45 12 34 56 78 ✏️</Text>
-          </View>
-          <View style={styles.innerBox}>
-            <Text>License plate: AD 87 123 ✏️</Text>
-          </View>
+            <EditableField 
+              label="Full Name" 
+              value={fullName} 
+              onSave={setFullName} 
+            />
+            <EditableField
+              label="E-mail"
+              value={email}
+              onSave={setEmail}
+            />          
+            <EditableField
+              label="Phone number"
+              value={phone}
+              onSave={setPhone}
+            />          
+            <EditableField
+              label="License plate"
+              value={licensePlate}
+              onSave={setLicensePlate}
+            />          
         </ProfileSection>
 
         <ProfileSection
