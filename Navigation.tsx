@@ -12,6 +12,8 @@ import ProfileScreen from "./screens/Profile/ProfileScreen";
 import HomePage from "./screens/HomePage";
 import Locations from "./screens/locations";
 import { House, MapPin, User } from "lucide-react-native";
+import { useSelector } from "react-redux";
+import { RootState } from "./store/store";
 
 // This is the type for the Profile stack
 export type ProfileStackParamList = {
@@ -161,10 +163,13 @@ const AuthNavigation = () => (
 );
 
 export default function Navigation() {
+  // const token = useSelector((state: RootState) => state.user.token);
+
+  // return <>{!token ? <AuthNavigation /> : <BasisNavigation />}</>;
+
   return (
     <>
-      {/* <BasisNavigation /> */}
-      <AuthNavigation />
+      <BasisNavigation />
     </>
   );
 }

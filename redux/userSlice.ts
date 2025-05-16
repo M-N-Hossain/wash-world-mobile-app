@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { CreateUserDto } from "./CreateUserDto";
 import { UserAPI } from "../APIs/UserAPI";
 import { LoginUserDto } from "./LoginUserDto";
+import * as SecureStore from "expo-secure-store";
 
 // export const signup = createAsyncThunk(
 //   "auth/signup",
@@ -35,6 +36,12 @@ const userSlice = createSlice({
     builder.addCase(login.fulfilled, (state, action) => {
       state.token = action.payload.token;
       state.errormessage = "";
+
+      // Save token to secure storage
+      SecureStore.setItemAsync(
+        "jwt",
+        JSON.stringify(action.payload.token)
+      );
     });
     builder.addCase(login.rejected, (state, action) => {
       state.token = "";
