@@ -1,7 +1,12 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
-import React from "react";
+import React, { useEffect } from "react";
+import { House, MapPin, User } from "lucide-react-native";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "./store/store";
+import * as SecureStore from "expo-secure-store";
+import { reloadJwtFromStorage } from "./redux/userSlice";
 
 ///////////////////// Screens /////////////////////
 import LoginScreen from "./screens/Auth/Login";
@@ -11,9 +16,6 @@ import MembershipOptionsScreen from "./screens/Profile/MembershipOptionsScreen";
 import ProfileScreen from "./screens/Profile/ProfileScreen";
 import HomePage from "./screens/HomePage";
 import Locations from "./screens/locations";
-import { House, MapPin, User } from "lucide-react-native";
-import { useSelector } from "react-redux";
-import { RootState } from "./store/store";
 
 // This is the type for the Profile stack
 export type ProfileStackParamList = {
@@ -113,8 +115,8 @@ function BasicTabs() {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: "#0ac267", // Optional: Controls label color when active
-        tabBarInactiveTintColor: "#666666", // Optional: Controls label color when inactive
+        tabBarActiveTintColor: "#0ac267",
+        tabBarInactiveTintColor: "#666666",
       }}
     >
       <Tab.Screen
@@ -163,13 +165,19 @@ const AuthNavigation = () => (
 );
 
 export default function Navigation() {
-  // const token = useSelector((state: RootState) => state.user.token);
+  const token = useSelector((state: RootState) => state.user.token);
+  const dispatch = useDispatch();
 
-  // return <>{!token ? <AuthNavigation /> : <BasisNavigation />}</>;
+  useEffect(() => {
+    const updateReduxToken = async () => {
+      const stored = JSON.parse((await SecureStore.getItemAsync("jwt")) || "");
+      if (stored) {
+        dispatch(reloadJwtFromStorage(stored));
+      }
+    };
 
-  return (
-    <>
-      <BasisNavigation />
-    </>
-  );
+    updateReduxToken();
+  }, []);
+
+  return <>{!token ? <BasisNavigation /> : <AuthNavigation />}</>;
 }

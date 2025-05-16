@@ -22,7 +22,6 @@ export default function LoginScreen() {
 
   // Handle login action
   const handleLogin = () => {
-    // console.log("Login pressed", { email, password });
     dispatch(login(new LoginUserDto(email, password)));
   };
 
