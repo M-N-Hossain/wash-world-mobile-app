@@ -5,6 +5,7 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import ProfileHeader from "../../components/ProfileHeader";
 import ProfileSection from "../../components/ProfileSection";
@@ -12,6 +13,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
 import { ProfileStackParamList } from "../../Navigation";
 import EditableField from "../../components/EditableField";
+import AlertMessage from "../../components/AlertMessage";
 
 export default function ProfileScreen() {
   type NavigationProp = NativeStackNavigationProp<
@@ -36,6 +38,12 @@ export default function ProfileScreen() {
   const [phone, setPhone] = useState("+45 12 34 56 78");
   const [licensePlate, setLicensePlate] = useState("AD 87 123");
 
+  // Alert state
+  const [showAlert, setShowAlert] = useState(false);
+  const showSuccessAlert = () => {
+    setShowAlert(true);
+  };
+
   return (
     <ScrollView style={styles.container}>
       <ProfileHeader />
@@ -48,22 +56,37 @@ export default function ProfileScreen() {
             <EditableField 
               label="Full Name" 
               value={fullName} 
-              onSave={setFullName} 
+              onSave={(newValue) => {
+                setFullName(newValue);
+                showSuccessAlert();
+              }}
             />
             <EditableField
               label="E-mail"
               value={email}
-              onSave={setEmail}
+              onSave={(newValue) => {
+                setEmail(newValue);
+                showSuccessAlert();
+              }
+              }
             />          
             <EditableField
               label="Phone number"
               value={phone}
-              onSave={setPhone}
+              onSave={(newValue) => {
+                setPhone(newValue);
+                showSuccessAlert();
+              }
+              }
             />          
             <EditableField
               label="License plate"
               value={licensePlate}
-              onSave={setLicensePlate}
+              onSave={(newValue) => {
+                setLicensePlate(newValue);
+                showSuccessAlert();
+              }
+              }
             />          
         </ProfileSection>
 
@@ -134,6 +157,15 @@ export default function ProfileScreen() {
           <Text style={styles.upgradeText}>Upgrade Membership</Text>
         </View>
       </TouchableOpacity>
+
+      {/* Alert message */}
+      {showAlert && (
+        <AlertMessage
+          type="success"
+          message="Changes saved successfully!"
+          onHide={() => setShowAlert(false)}
+        />
+      )}
     </ScrollView>
   );
 }
