@@ -11,6 +11,7 @@ import ProfileSection from "../../components/ProfileSection";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
 import { ProfileStackParamList } from "../../Navigation";
+import EditableField from "../../components/EditableField";
 
 export default function ProfileScreen() {
   type NavigationProp = NativeStackNavigationProp<
@@ -29,6 +30,9 @@ export default function ProfileScreen() {
     setOpenSection((prev) => (prev === sectionName ? null : sectionName));
   };
 
+  const [fullName, setFullName] = useState("John Super Doe");
+
+
   return (
     <ScrollView style={styles.container}>
       <ProfileHeader />
@@ -39,7 +43,7 @@ export default function ProfileScreen() {
           onPress={() => toggleSection("user")}
         >
           <View style={styles.innerBox}>
-            <Text>Full Name: John Super Doe ✏️</Text>
+            <EditableField label="Full Name" value={fullName} onSave={setFullName} />
           </View>
           <View style={styles.innerBox}>
             <Text>E-mail: johnSuper@doe.com ✏️</Text>
