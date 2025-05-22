@@ -3,8 +3,8 @@ export class CreateUserDto {
     public firstName: string,
     public lastName: string,
     public licensePlate: string,
+    public membership: string,
     public email: string,
-    public password: string,
-    public membership: string
+    public password: string
   ) {}
 }

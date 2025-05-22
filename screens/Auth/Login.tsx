@@ -13,9 +13,20 @@ import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../store/store";
 import { LoginUserDto } from "../../redux/LoginUserDto";
 import { login } from "../../redux/userSlice";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { AuthStackParamList } from "../../Navigation";
+import { useNavigation } from "@react-navigation/native";
 
 export default function LoginScreen() {
   const dispatch = useDispatch<AppDispatch>();
+
+  // Navigation
+  type NavigationProp = NativeStackNavigationProp<
+    AuthStackParamList,
+    "LoginScreen"
+  >;
+
+  const navigation = useNavigation<NavigationProp>();
 
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -24,6 +35,12 @@ export default function LoginScreen() {
   const handleLogin = () => {
     // console.log("Login button pressed");
     dispatch(login(new LoginUserDto(email, password)));
+  };
+
+  // Handle register action
+  const handleRegister = () => {
+    // console.log("Register button pressed");
+    navigation.navigate("RegisterScreen");
   };
 
   return (
@@ -82,7 +99,9 @@ export default function LoginScreen() {
       <View style={styles.footer}>
         <View style={styles.footerLeft}>
           <Text>Already have an account?</Text>
-          <Text style={styles.link}>Register instead</Text>
+          <TouchableOpacity onPress={handleRegister}>
+            <Text style={styles.link}>Register instead</Text>
+          </TouchableOpacity>
         </View>
         <Text style={styles.link}>Forgot password</Text>
       </View>

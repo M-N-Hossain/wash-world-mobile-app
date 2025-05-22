@@ -4,12 +4,18 @@ import { UserAPI } from "../APIs/UserAPI";
 import { LoginUserDto } from "./LoginUserDto";
 import * as SecureStore from "expo-secure-store";
 
-// export const signup = createAsyncThunk(
-//   "auth/signup",
-//   async (createUserDto: CreateUserDto, thunkApi) => {
-//     return await UserAPI.signupUser(createUserDto);
-//   }
-// );
+export const signup = createAsyncThunk(
+  "auth/signup",
+  async (createUserDto: CreateUserDto, thunkApi) => {
+    const response = await UserAPI.signupUser(createUserDto);
+    const token = response.access_token;
+
+    // Save the token securely immediately
+    await SecureStore.setItemAsync("jwt", JSON.stringify(token));
+
+    return { token };
+  }
+);
 
 export const login = createAsyncThunk(
   "auth/login",
@@ -57,6 +63,14 @@ const userSlice = createSlice({
     builder.addCase(login.rejected, (state, action) => {
       state.token = "";
       state.errormessage = "Login failed. Please try again.";
+    });
+    builder.addCase(signup.fulfilled, (state, action) => {
+      state.token = action.payload.token;
+      state.errormessage = "";
+    });
+    builder.addCase(signup.rejected, (state, action) => {
+      state.token = "";
+      state.errormessage = "Signup failed. Please try again.";
     });
   },
 });
