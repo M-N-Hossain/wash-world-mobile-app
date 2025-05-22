@@ -150,34 +150,31 @@ function BasicTabs() {
   );
 }
 
-// Navigation used for the logged in user
-const BasisNavigation = () => (
-  <NavigationContainer>
-    <BasicTabs />
-  </NavigationContainer>
-);
-
-// Navigation used for the logged out users
-const AuthNavigation = () => (
-  <NavigationContainer>
-    <AuthStack />
-  </NavigationContainer>
-);
-
 export default function Navigation() {
   const token = useSelector((state: RootState) => state.user.token);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const updateReduxToken = async () => {
-      const stored = JSON.parse((await SecureStore.getItemAsync("jwt")) || "");
+    async function updateReduxToken() {
+      const stored = await SecureStore.getItemAsync("jwt");
       if (stored) {
-        dispatch(reloadJwtFromStorage(stored));
+        try {
+          const parsedToken = JSON.parse(stored);
+          if (parsedToken && typeof parsedToken === "string") {
+            console.log("Parsed token:", parsedToken);
+            dispatch(reloadJwtFromStorage(parsedToken));
+          }
+        } catch (error) {
+          console.error("Error parsing token:", error);
+        }
       }
-    };
-
+    }
     updateReduxToken();
   }, []);
 
-  return <>{!token ? <BasisNavigation /> : <AuthNavigation />}</>;
+  return (
+    <NavigationContainer>
+      {token ? <BasicTabs /> : <AuthStack />}
+    </NavigationContainer>
+  );
 }
