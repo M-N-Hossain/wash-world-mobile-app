@@ -1,17 +1,22 @@
 import { CarFront, ChevronRight } from "lucide-react-native";
-import { StyleSheet, Text, View } from "react-native";
-import FakeButton from "./FakeButton";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import FakeButton from "../FakeButton";
 
-type Location = {
+type MapCalloutProps = {
   name: string;
   address: string;
   open_hours: string;
+  handleSeeMore: () => void;
 };
 
 // This is a custom callout component for the map marker
 // It displays the location name, address, and opening hours
-
-export default function MapCallout({ name, address, open_hours }: Location) {
+export default function MapCallout({
+  name,
+  address,
+  open_hours,
+  handleSeeMore,
+}: MapCalloutProps) {
   return (
     <View style={styles.CalloutContainer}>
       <View style={styles.CalloutHeader}>
@@ -21,10 +26,10 @@ export default function MapCallout({ name, address, open_hours }: Location) {
         <View style={styles.CalloutMiddleTop}>
           <Text style={styles.CalloutMiddleBold}>{address}</Text>
         </View>
-        <View style={styles.CalloutDistance}>
-          <Text style={styles.CalloutDistanceText}>0.67 km</Text>
+        <TouchableOpacity style={styles.CalloutSeeMore} onPress={handleSeeMore}>
+          <Text style={styles.CalloutSeeMoreText}>See more</Text>
           <ChevronRight color="black" size={20} strokeWidth={2} />
-        </View>
+        </TouchableOpacity>
       </View>
       <View style={styles.CalloutMiddle}>
         <Text style={styles.CalloutMiddleAddress}>{name}</Text>
@@ -65,12 +70,12 @@ const styles = StyleSheet.create({
   CalloutMiddleTop: {
     width: 210,
   },
-  CalloutDistance: {
+  CalloutSeeMore: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
-  CalloutDistanceText: {
+  CalloutSeeMoreText: {
     fontSize: 18,
     fontWeight: "bold",
     color: "#000000",

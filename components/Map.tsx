@@ -9,7 +9,8 @@ import {
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { useLocations } from "../hooks/useLocations";
 import { useState } from "react";
-import MapCallout from "./MapCallout";
+import MapCallout from "./Callouts/MapCallout";
+import MapCalloutExtended from "./Callouts/MapCalloutExtended";
 
 // Using percentage for height and width is not recommended in this case
 // because the map needs to be a fixed size to work properly. Instead, we use Dimensions API to get the window size.
@@ -45,6 +46,26 @@ export default function Map() {
     null | (typeof locations)[0]
   >(null);
 
+  //Extended MapCallout logic
+  const [extendedMapCallout, setExtendedMapCallout] = useState<null | {
+    name: string;
+    address: string;
+    open_hours: string;
+  }>(null);
+
+  const handleExtendedCallout = () => {
+    console.log("Extended callout pressed");
+
+    if (selectedLocation) {
+      setExtendedMapCallout({
+        name: selectedLocation.name,
+        address: selectedLocation.address,
+        open_hours: selectedLocation.open_hours,
+      });
+      setSelectedLocation(null);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.searchBar}>
@@ -60,7 +81,10 @@ export default function Map() {
         provider={PROVIDER_GOOGLE}
         initialRegion={initialRegion}
         // when you press on the map, it will close the callout and set the selected location to null
-        onPress={() => setSelectedLocation(null)}
+        onPress={() => {
+          setSelectedLocation(null);
+          setExtendedMapCallout(null);
+        }}
       >
         {filteredLocations.map((location, index) => (
           <Marker
@@ -82,6 +106,7 @@ export default function Map() {
               setSelectedLocation(location);
               Keyboard.dismiss();
               setSearch("");
+              setExtendedMapCallout(null);
             }}
             // This is used to prevent the marker from re-rendering when the state changes
             tracksViewChanges={false}
@@ -94,6 +119,20 @@ export default function Map() {
             address={selectedLocation.name}
             open_hours={selectedLocation.open_hours}
             name={selectedLocation.address}
+            handleSeeMore={handleExtendedCallout}
+          />
+        </View>
+      )}
+      {extendedMapCallout && (
+        <View style={styles.calloutExtended}>
+          <MapCalloutExtended
+            address={extendedMapCallout.name}
+            open_hours={extendedMapCallout.open_hours}
+            name={extendedMapCallout.address}
+            handleBackPress={() => {
+              setExtendedMapCallout(null);
+              setSelectedLocation(null);
+            }}
           />
         </View>
       )}
@@ -123,5 +162,8 @@ const styles = StyleSheet.create({
   },
   callout: {
     alignItems: "center",
+  },
+  calloutExtended: {
+    ...StyleSheet.absoluteFillObject, // make it fill the screen
   },
 });
