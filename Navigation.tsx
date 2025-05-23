@@ -1,17 +1,21 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
-import React from "react";
+import React, { useEffect } from "react";
+import { House, MapPin, User } from "lucide-react-native";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "./store/store";
+import * as SecureStore from "expo-secure-store";
+import { reloadJwtFromStorage } from "./redux/userSlice";
 
 ///////////////////// Screens /////////////////////
-// import LoginScreen from "./screens/Auth/Login";
-// import RegisterScreen from "./screens/Auth/Register";
-// import OnboardingScreen from "./screens/Onboarding/OnboardingScreen";
+import LoginScreen from "./screens/Auth/Login";
+import RegisterScreen from "./screens/Auth/Register";
+import OnboardingScreen from "./screens/Onboarding/OnboardingScreen";
 import MembershipOptionsScreen from "./screens/Profile/MembershipOptionsScreen";
 import ProfileScreen from "./screens/Profile/ProfileScreen";
 import HomePage from "./screens/HomePage";
 import Locations from "./screens/locations";
-import { House, MapPin, User } from "lucide-react-native";
 
 // This is the type for the Profile stack
 export type ProfileStackParamList = {
@@ -24,6 +28,46 @@ export type HomepageStackParamList = {
   Homepage: undefined;
   Locations: undefined;
 };
+
+// This is the type for the Auth stack
+export type AuthStackParamList = {
+  LoginScreen: undefined;
+  RegisterScreen: undefined;
+  OnboardingScreen: undefined;
+};
+
+// Auth stack
+const AuthStackNavigator = createNativeStackNavigator<AuthStackParamList>();
+
+function AuthStack() {
+  return (
+    <AuthStackNavigator.Navigator>
+      {/* <AuthStackNavigator.Screen
+        name="OnboardingScreen"
+        component={OnboardingScreen}
+        options={{
+          headerShown: false,
+        }}
+      /> */}
+      <AuthStackNavigator.Screen
+        name="LoginScreen"
+        component={LoginScreen}
+        options={{
+          title: "Login",
+          headerShown: false,
+        }}
+      />
+      <AuthStackNavigator.Screen
+        name="RegisterScreen"
+        component={RegisterScreen}
+        options={{
+          title: "Register",
+          headerShown: false,
+        }}
+      />
+    </AuthStackNavigator.Navigator>
+  );
+}
 
 // Profile stack
 const ProfileStackNavigator =
@@ -71,8 +115,8 @@ function BasicTabs() {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: "#0ac267", // Optional: Controls label color when active
-        tabBarInactiveTintColor: "#666666", // Optional: Controls label color when inactive
+        tabBarActiveTintColor: "#0ac267",
+        tabBarInactiveTintColor: "#666666",
       }}
     >
       <Tab.Screen
@@ -106,17 +150,31 @@ function BasicTabs() {
   );
 }
 
-// Navigation used for the logged in user
-const BasisNavigation = () => (
-  <NavigationContainer>
-    <BasicTabs />
-  </NavigationContainer>
-);
-
 export default function Navigation() {
+  const token = useSelector((state: RootState) => state.user.token);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    async function updateReduxToken() {
+      const stored = await SecureStore.getItemAsync("jwt");
+      if (stored) {
+        try {
+          const parsedToken = JSON.parse(stored);
+          if (parsedToken && typeof parsedToken === "string") {
+            console.log("Parsed token:", parsedToken);
+            dispatch(reloadJwtFromStorage(parsedToken));
+          }
+        } catch (error) {
+          console.error("Error parsing token:", error);
+        }
+      }
+    }
+    updateReduxToken();
+  }, []);
+
   return (
-    <>
-      <BasisNavigation />
-    </>
+    <NavigationContainer>
+      {token ? <BasicTabs /> : <AuthStack />}
+    </NavigationContainer>
   );
 }
