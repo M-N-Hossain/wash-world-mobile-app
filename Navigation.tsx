@@ -18,6 +18,7 @@ import ProfileScreen from "./screens/Profile/ProfileScreen";
 import HomePage from "./screens/HomePage";
 import Locations from "./screens/locations";
 import History from "./screens/History";
+import Feedback from "./screens/Feedback";
 
 // This is the type for the Profile stack
 export type ProfileStackParamList = {
@@ -29,7 +30,12 @@ export type ProfileStackParamList = {
 export type HomepageStackParamList = {
   Homepage: undefined;
   Locations: undefined;
+  WashHistoryStack: { screen: string };
+};
+
+export type WashHistoryStackParamList = {
   History: undefined;
+  Feedback: undefined;
 };
 
 // This is the type for the Auth stack
@@ -97,6 +103,19 @@ function ProfileStack() {
   );
 }
 
+// Wash history stack
+const FeedbackStackNavigator =
+  createNativeStackNavigator<WashHistoryStackParamList>();
+
+function WashHistoryStack() {
+  return (
+    <FeedbackStackNavigator.Navigator>
+      <FeedbackStackNavigator.Screen name="History" component={History} />
+      <FeedbackStackNavigator.Screen name="Feedback" component={Feedback} />
+    </FeedbackStackNavigator.Navigator>
+  );
+}
+
 // Homepage stack
 const HomepageStackNavigator =
   createNativeStackNavigator<HomepageStackParamList>();
@@ -106,16 +125,6 @@ function HomepageStack() {
     <HomepageStackNavigator.Navigator screenOptions={{ headerShown: false }}>
       <HomepageStackNavigator.Screen name="Homepage" component={HomePage} />
       <HomepageStackNavigator.Screen name="Locations" component={Locations} />
-      <HomepageStackNavigator.Screen
-        name="History"
-        component={History}
-        options={{
-          title: "Wash History",
-          headerShown: true,
-          headerStyle: { backgroundColor: "#0ac267" },
-          headerTintColor: "#fff",
-        }}
-      />
     </HomepageStackNavigator.Navigator>
   );
 }
@@ -163,6 +172,19 @@ function BasicTabs() {
   );
 }
 
+const RootStack = createNativeStackNavigator();
+
+function RootStackNavigator() {
+  return (
+    <RootStack.Navigator screenOptions={{ headerShown: false }}>
+      {/* Main tabs */}
+      <RootStack.Screen name="MainTabs" component={BasicTabs} />
+      {/* Stack for history + feedback, outside of tabs */}
+      <RootStack.Screen name="WashHistoryStack" component={WashHistoryStack} />
+    </RootStack.Navigator>
+  );
+}
+
 export default function Navigation() {
   const token = useSelector((state: RootState) => state.user.token);
   const isLoadingUser = useSelector(
@@ -195,17 +217,21 @@ export default function Navigation() {
     initAuth();
   }, []);
 
+  if (!token) {
+    return (
+      <NavigationContainer>
+        <AuthStack />
+      </NavigationContainer>
+    );
+  }
+
+  if (isLoadingUser || user_profile.id === 0) {
+    return <LoadingScreen />;
+  }
+
   return (
     <NavigationContainer>
-      {token ? (
-        isLoadingUser || user_profile.id === 0 ? (
-          <LoadingScreen />
-        ) : (
-          <BasicTabs />
-        )
-      ) : (
-        <AuthStack />
-      )}
+      <RootStackNavigator />
     </NavigationContainer>
   );
 }

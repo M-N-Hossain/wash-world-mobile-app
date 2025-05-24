@@ -34,7 +34,9 @@ export default function HomePage() {
 
   const handleHistoryPress = () => {
     // console.log("See full history pressed");
-    navigation.navigate("History");
+    navigation.navigate("WashHistoryStack", {
+      screen: "History",
+    });
   };
 
   const user = useSelector((state: RootState) => state.user.user_profile);
