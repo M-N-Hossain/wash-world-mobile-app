@@ -1,13 +1,14 @@
 import axios from "axios";
 import { CreateUserDto } from "../redux/CreateUserDto";
 import { LoginUserDto } from "../redux/LoginUserDto";
+import { jwtDecode } from "jwt-decode";
 
 export class UserAPI {
-  static USER_URL = "http://10.0.2.2:3000/auth";
+  static API_URL = "http://10.0.2.2:3000";
 
   static async loginUser(userDto: LoginUserDto) {
     try {
-      const response = await axios.post(`${this.USER_URL}/login`, userDto);
+      const response = await axios.post(`${this.API_URL}/auth/login`, userDto);
       return response.data;
     } catch (error) {
       console.error("Error logging in user:", error);
@@ -16,10 +17,24 @@ export class UserAPI {
   }
   static async signupUser(userDto: CreateUserDto) {
     try {
-      const response = await axios.post(`${this.USER_URL}/signup`, userDto);
+      const response = await axios.post(`${this.API_URL}/auth/signup`, userDto);
       return response.data;
     } catch (error) {
       console.error("Error signing up user:", error);
+      throw error;
+    }
+  }
+
+  static async getUserById(token: string) {
+    try {
+      const decodedToken = jwtDecode<{ id: number }>(token);
+      const userId = decodedToken.id;
+      const response = await axios.post(`${this.API_URL}/users/getUserById`, {
+        id: userId,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching user by ID:", error);
       throw error;
     }
   }
