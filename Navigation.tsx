@@ -4,9 +4,9 @@ import { NavigationContainer } from "@react-navigation/native";
 import React, { useEffect } from "react";
 import { House, MapPin, User } from "lucide-react-native";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "./store/store";
+import { AppDispatch, RootState } from "./store/store";
 import * as SecureStore from "expo-secure-store";
-import { reloadJwtFromStorage } from "./redux/userSlice";
+import { getUser, reloadJwtFromStorage } from "./redux/userSlice";
 
 ///////////////////// Screens /////////////////////
 import LoginScreen from "./screens/Auth/Login";
@@ -152,7 +152,7 @@ function BasicTabs() {
 
 export default function Navigation() {
   const token = useSelector((state: RootState) => state.user.token);
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
     async function updateReduxToken() {
@@ -161,7 +161,7 @@ export default function Navigation() {
         try {
           const parsedToken = JSON.parse(stored);
           if (parsedToken && typeof parsedToken === "string") {
-            console.log("Parsed token:", parsedToken);
+            // console.log("Parsed token:", parsedToken);
             dispatch(reloadJwtFromStorage(parsedToken));
           }
         } catch (error) {
@@ -170,6 +170,18 @@ export default function Navigation() {
       }
     }
     updateReduxToken();
+  }, []);
+
+  useEffect(() => {
+    const loadTokenAndUser = async () => {
+      const token = await SecureStore.getItemAsync("jwt");
+      if (token) {
+        const parsedToken = JSON.parse(token);
+        dispatch(reloadJwtFromStorage(parsedToken));
+        dispatch(getUser(parsedToken));
+      }
+    };
+    loadTokenAndUser();
   }, []);
 
   return (

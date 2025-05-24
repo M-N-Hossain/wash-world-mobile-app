@@ -21,18 +21,7 @@ export default function MapCalloutExtended({
   open_hours,
   handleBackPress,
 }: MapCalloutExtendedProps) {
-  const [user_id, setUserId] = useState<number>(0);
-
-  // Get token from Redux
-  const token = useSelector((state: RootState) => state.user.token);
-  useEffect(() => {
-    if (token) {
-      UserAPI.getUserById(token).then((user) => {
-        setUserId(user.id);
-        console.log("User fetched:", user);
-      });
-    }
-  }, [token]);
+  const user = useSelector((state: RootState) => state.user.user_profile);
 
   const { mutate: registerWash, isPending, error } = useRegisterWash();
 
@@ -40,6 +29,7 @@ export default function MapCalloutExtended({
   const handleBeginWash = () => {
     console.log("Begin wash");
     const wash_location = name;
+    const user_id = user.id;
     const washEntity: WashEntity = new WashEntity(wash_location, user_id);
 
     registerWash(washEntity, {
