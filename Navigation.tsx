@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "./store/store";
 import * as SecureStore from "expo-secure-store";
 import { getUser, reloadJwtFromStorage } from "./redux/userSlice";
+import LoadingScreen from "./components/LoadingScreen";
 
 ///////////////////// Screens /////////////////////
 import LoginScreen from "./screens/Auth/Login";
@@ -16,6 +17,7 @@ import MembershipOptionsScreen from "./screens/Profile/MembershipOptionsScreen";
 import ProfileScreen from "./screens/Profile/ProfileScreen";
 import HomePage from "./screens/HomePage";
 import Locations from "./screens/locations";
+import History from "./screens/History";
 
 // This is the type for the Profile stack
 export type ProfileStackParamList = {
@@ -27,6 +29,7 @@ export type ProfileStackParamList = {
 export type HomepageStackParamList = {
   Homepage: undefined;
   Locations: undefined;
+  History: undefined;
 };
 
 // This is the type for the Auth stack
@@ -103,6 +106,16 @@ function HomepageStack() {
     <HomepageStackNavigator.Navigator screenOptions={{ headerShown: false }}>
       <HomepageStackNavigator.Screen name="Homepage" component={HomePage} />
       <HomepageStackNavigator.Screen name="Locations" component={Locations} />
+      <HomepageStackNavigator.Screen
+        name="History"
+        component={History}
+        options={{
+          title: "Wash History",
+          headerShown: true,
+          headerStyle: { backgroundColor: "#0ac267" },
+          headerTintColor: "#fff",
+        }}
+      />
     </HomepageStackNavigator.Navigator>
   );
 }
@@ -152,41 +165,47 @@ function BasicTabs() {
 
 export default function Navigation() {
   const token = useSelector((state: RootState) => state.user.token);
+  const isLoadingUser = useSelector(
+    (state: RootState) => state.user.isLoadingUser
+  );
+  const user_profile = useSelector(
+    (state: RootState) => state.user.user_profile
+  );
+
   const dispatch = useDispatch<AppDispatch>();
 
+  // Initialize auth state from secure storage
   useEffect(() => {
-    async function updateReduxToken() {
-      const stored = await SecureStore.getItemAsync("jwt");
-      if (stored) {
-        try {
+    const initAuth = async () => {
+      try {
+        const stored = await SecureStore.getItemAsync("jwt");
+        if (stored) {
           const parsedToken = JSON.parse(stored);
           if (parsedToken && typeof parsedToken === "string") {
-            // console.log("Parsed token:", parsedToken);
             dispatch(reloadJwtFromStorage(parsedToken));
+            setTimeout(() => {
+              dispatch(getUser(parsedToken));
+            }, 100);
           }
-        } catch (error) {
-          console.error("Error parsing token:", error);
         }
-      }
-    }
-    updateReduxToken();
-  }, []);
-
-  useEffect(() => {
-    const loadTokenAndUser = async () => {
-      const token = await SecureStore.getItemAsync("jwt");
-      if (token) {
-        const parsedToken = JSON.parse(token);
-        dispatch(reloadJwtFromStorage(parsedToken));
-        dispatch(getUser(parsedToken));
+      } catch (err) {
+        console.error("Failed to initialize auth:", err);
       }
     };
-    loadTokenAndUser();
+    initAuth();
   }, []);
 
   return (
     <NavigationContainer>
-      {token ? <BasicTabs /> : <AuthStack />}
+      {token ? (
+        isLoadingUser || user_profile.id === 0 ? (
+          <LoadingScreen />
+        ) : (
+          <BasicTabs />
+        )
+      ) : (
+        <AuthStack />
+      )}
     </NavigationContainer>
   );
 }

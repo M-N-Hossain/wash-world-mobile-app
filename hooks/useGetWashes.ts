@@ -22,7 +22,7 @@ export const useGetWashes = (id: number) => {
 
     return response.data;
   };
-  const { isLoading, isError, data, error } = useQuery({
+  const { isLoading, isError, data, error, refetch } = useQuery({
     queryKey: ["washes", id],
     queryFn: fetchWashes,
   });

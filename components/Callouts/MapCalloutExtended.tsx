@@ -27,7 +27,6 @@ export default function MapCalloutExtended({
 
   // Function to handle registering a wash
   const handleBeginWash = () => {
-    console.log("Begin wash");
     const wash_location = name;
     const user_id = user.id;
     const washEntity: WashEntity = new WashEntity(wash_location, user_id);

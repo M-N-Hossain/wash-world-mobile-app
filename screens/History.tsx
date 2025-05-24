@@ -1,0 +1,61 @@
+import { ScrollView, StyleSheet, Text, View } from "react-native";
+import WashCard from "../components/WashHistoryCard";
+import { useSelector } from "react-redux";
+import { RootState } from "../store/store";
+import { useGetWashes } from "../hooks/useGetWashes";
+import { formatDate } from "../utils/formatDate";
+
+export default function History() {
+  const user = useSelector((state: RootState) => state.user.user_profile);
+  const { isLoading, error, data } = useGetWashes(user.id);
+
+  return (
+    <View style={styles.container}>
+      <ScrollView style={styles.scrollContainer}>
+        <View style={{ marginBottom: 20 }}>
+          <Text style={styles.introText}>
+            This is the full list of all your visits
+          </Text>
+          <Text style={styles.introText}>
+            You can give feedback on each wash if you press the "Report an issue
+            button"
+          </Text>
+        </View>
+        {isLoading && <Text>Loading...</Text>}
+        {error && <Text>Error: {error.message}</Text>}
+        {data &&
+          data.map(
+            (wash: {
+              wash_id: React.Key;
+              wash_location: string;
+              wash_date: string;
+            }) => (
+              <WashCard
+                key={wash.wash_id}
+                name={wash.wash_location}
+                date={formatDate(wash.wash_date)}
+              />
+            )
+          )}
+      </ScrollView>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: "center",
+    backgroundColor: "#fff",
+  },
+  scrollContainer: {
+    padding: 20,
+    paddingBottom: 100,
+    width: "100%",
+  },
+  introText: {
+    fontSize: 16,
+    color: "black",
+    textAlign: "center",
+  },
+});

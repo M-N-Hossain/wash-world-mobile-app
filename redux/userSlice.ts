@@ -11,6 +11,7 @@ export const signup = createAsyncThunk(
     const token = response.access_token;
 
     // Save the token securely immediately
+    await SecureStore.deleteItemAsync("jwt");
     await SecureStore.setItemAsync("jwt", JSON.stringify(token));
 
     await thunkApi.dispatch(getUser(token));
@@ -26,6 +27,7 @@ export const login = createAsyncThunk(
     const token = response.access_token;
 
     // Save the token securely immediately
+    await SecureStore.deleteItemAsync("jwt");
     await SecureStore.setItemAsync("jwt", JSON.stringify(token));
 
     await thunkApi.dispatch(getUser(token));
@@ -52,6 +54,7 @@ export const getUser = createAsyncThunk(
 type UserState = {
   token: string;
   errormessage: string;
+  isLoadingUser: boolean;
   user_profile: {
     id: number;
     firstName: string;
@@ -65,6 +68,7 @@ type UserState = {
 const initialState: UserState = {
   token: "",
   errormessage: "",
+  isLoadingUser: false,
   user_profile: {
     id: 0,
     firstName: "",
@@ -81,6 +85,15 @@ const userSlice = createSlice({
   reducers: {
     reloadJwtFromStorage: (state, action: PayloadAction<string>) => {
       state.token = action.payload;
+
+      state.user_profile = {
+        id: 0,
+        firstName: "",
+        lastName: "",
+        licensePlate: "",
+        email: "",
+        membership: "",
+      };
     },
     logout: (state) => {
       state.token = "";
@@ -116,6 +129,8 @@ const userSlice = createSlice({
       state.errormessage = "Signup failed. Please try again.";
     });
     builder.addCase(getUser.fulfilled, (state, action) => {
+      state.isLoadingUser = false;
+
       state.user_profile = {
         id: action.payload.id,
         firstName: action.payload.firstName,
@@ -126,7 +141,12 @@ const userSlice = createSlice({
       };
       state.errormessage = "";
     });
+    builder.addCase(getUser.pending, (state) => {
+      state.isLoadingUser = true;
+    });
     builder.addCase(getUser.rejected, (state, action) => {
+      state.isLoadingUser = false;
+
       state.user_profile = {
         id: 0,
         firstName: "",

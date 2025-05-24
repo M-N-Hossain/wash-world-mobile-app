@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -28,11 +28,15 @@ export default function HomePage() {
   const navigation = useNavigation<NavigationProp>();
 
   const handleLocationPress = () => {
-    console.log("See all locations pressed");
+    // console.log("See all locations pressed");
     navigation.navigate("Locations");
   };
 
-  // Get user information from Redux store
+  const handleHistoryPress = () => {
+    // console.log("See full history pressed");
+    navigation.navigate("History");
+  };
+
   const user = useSelector((state: RootState) => state.user.user_profile);
   const { isLoading, error, data } = useGetWashes(user.id);
 
@@ -93,7 +97,10 @@ export default function HomePage() {
             )}
 
         <View style={styles.linkWrapper}>
-          <TouchableOpacity style={styles.linkButton}>
+          <TouchableOpacity
+            style={styles.linkButton}
+            onPress={handleHistoryPress}
+          >
             <Text style={styles.linkText}>See full history</Text>
             <ArrowUpRight color="#777777" size={30} />
           </TouchableOpacity>
