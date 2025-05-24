@@ -13,6 +13,8 @@ export const signup = createAsyncThunk(
     // Save the token securely immediately
     await SecureStore.setItemAsync("jwt", JSON.stringify(token));
 
+    await thunkApi.dispatch(getUser(token));
+
     return { token };
   }
 );
@@ -25,6 +27,8 @@ export const login = createAsyncThunk(
 
     // Save the token securely immediately
     await SecureStore.setItemAsync("jwt", JSON.stringify(token));
+
+    await thunkApi.dispatch(getUser(token));
 
     return { token };
   }

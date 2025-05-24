@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -14,6 +14,10 @@ import LiveStatusCard from "../components/LiveStatusCard";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { HomepageStackParamList } from "../Navigation";
 import { useNavigation } from "@react-navigation/native";
+import { useGetWashes } from "../hooks/useGetWashes";
+import { useSelector } from "react-redux";
+import { RootState } from "../store/store";
+import { formatDate } from "../utils/formatDate";
 
 export default function HomePage() {
   type NavigationProp = NativeStackNavigationProp<
@@ -27,6 +31,10 @@ export default function HomePage() {
     console.log("See all locations pressed");
     navigation.navigate("Locations");
   };
+
+  // Get user information from Redux store
+  const user = useSelector((state: RootState) => state.user.user_profile);
+  const { isLoading, error, data } = useGetWashes(user.id);
 
   return (
     <View style={styles.container}>
@@ -65,8 +73,24 @@ export default function HomePage() {
 
         {/* Last Washes */}
         <Text style={styles.sectionTitle}>Last Washes</Text>
-        <WashCard name="Wash World Lyngby" date="April 25th – 2025" />
-        <WashCard name="Wash World Lyngby" date="April 25th – 2025" />
+        {isLoading && <Text>Loading...</Text>}
+        {error && <Text>Error fetching washes: {error.message}</Text>}
+        {data &&
+          data
+            .slice(0, 2)
+            .map(
+              (wash: {
+                wash_id: React.Key;
+                wash_location: string;
+                wash_date: string;
+              }) => (
+                <WashCard
+                  key={wash.wash_id}
+                  name={wash.wash_location}
+                  date={formatDate(wash.wash_date)}
+                />
+              )
+            )}
 
         <View style={styles.linkWrapper}>
           <TouchableOpacity style={styles.linkButton}>

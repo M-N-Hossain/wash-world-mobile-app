@@ -7,10 +7,10 @@ interface Props {
   onReportIssue?: () => void;
 }
 
-export default function WashCard({ 
-  name, 
+export default function WashCard({
+  name,
   date,
-  onReportIssue = () => {} 
+  onReportIssue = () => {},
 }: Props) {
   return (
     <View style={styles.card}>
@@ -19,10 +19,7 @@ export default function WashCard({
         <Text style={styles.date}>{date}</Text>
       </View>
 
-      <TouchableOpacity 
-        style={styles.button}
-        onPress={onReportIssue}
-      >
+      <TouchableOpacity style={styles.button} onPress={onReportIssue}>
         <Text style={styles.buttonText}>Report an issue</Text>
       </TouchableOpacity>
     </View>
@@ -39,30 +36,30 @@ const styles = StyleSheet.create({
     borderBottomColor: "#0AC267",
   },
   contentContainer: {
-    padding: 15
+    padding: 15,
   },
   name: {
     color: "#1E1E1E",
     fontWeight: "bold",
     fontSize: 20,
-    marginBottom: 4
+    marginBottom: 4,
   },
   date: {
     color: "#777777",
-    fontSize: 18
+    fontSize: 18,
   },
   button: {
-    backgroundColor: "#0AC267", 
+    backgroundColor: "#0AC267",
     alignSelf: "flex-end",
     paddingVertical: 15,
     paddingHorizontal: 25,
-    width: "60%", 
+    width: "60%",
     alignItems: "center",
-    borderTopLeftRadius: 20
+    borderTopLeftRadius: 20,
   },
   buttonText: {
     color: "#FFFFFF",
     fontWeight: "bold",
-    fontSize: 18
-  }
+    fontSize: 18,
+  },
 });

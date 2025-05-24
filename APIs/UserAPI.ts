@@ -9,6 +9,7 @@ export class UserAPI {
   static async loginUser(userDto: LoginUserDto) {
     try {
       const response = await axios.post(`${this.API_URL}/auth/login`, userDto);
+      console.log("Full response from backend:", response.data)
       return response.data;
     } catch (error) {
       console.error("Error logging in user:", error);
@@ -34,7 +35,7 @@ export class UserAPI {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log("Full response from backend:", response.data)
+      // console.log("Full response from backend:", response.data)
       return response.data;
     } catch (error) {
       console.error("Error fetching user by ID:", error);
