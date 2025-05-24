@@ -1,7 +1,6 @@
 import { View } from "react-native";
 import ExtendedTop from "./ExtendedTop";
 import ExtendedBottom from "./ExtendedBottom";
-import { useQueryClient } from "@tanstack/react-query";
 import { useRegisterWash } from "../../hooks/useRegisterWash";
 import { WashEntity } from "../../entities/RegisterWash";
 import { useSelector } from "react-redux";
@@ -35,14 +34,22 @@ export default function MapCalloutExtended({
     }
   }, [token]);
 
-  const queryClient = useQueryClient();
-  const { mutate: registerWash } = useRegisterWash();
+  const { mutate: registerWash, isPending, error } = useRegisterWash();
 
   // Function to handle registering a wash
   const handleBeginWash = () => {
     console.log("Begin wash");
-    // const wash_location = name;
-    // const washEntity: WashEntity = new WashEntity(wash_location, user_id);
+    const wash_location = name;
+    const washEntity: WashEntity = new WashEntity(wash_location, user_id);
+
+    registerWash(washEntity, {
+      onSuccess: () => {
+        console.log("Wash registered successfully");
+      },
+      onError: (error) => {
+        console.error("Error registering wash:", error);
+      },
+    });
   };
 
   return (

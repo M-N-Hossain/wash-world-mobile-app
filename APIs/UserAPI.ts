@@ -29,8 +29,10 @@ export class UserAPI {
     try {
       const decodedToken = jwtDecode<{ id: number }>(token);
       const userId = decodedToken.id;
-      const response = await axios.post(`${this.API_URL}/users/getUserById`, {
-        id: userId,
+      const response = await axios.get(`${this.API_URL}/users/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
       return response.data;
     } catch (error) {
