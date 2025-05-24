@@ -1,7 +1,7 @@
 import { CircleUser, LogOut } from "lucide-react-native";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../store/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../store/store";
 import { logout } from "../redux/userSlice";
 
 export default function Header() {
@@ -12,11 +12,14 @@ export default function Header() {
     dispatch(logout());
   };
 
+  // Get user information from Redux store
+  const user = useSelector((state: RootState) => state.user.user_profile);
+
   return (
     <View style={styles.headerContainer}>
       <View style={styles.userInfo}>
         <CircleUser color="black" size={50} strokeWidth={1} />
-        <Text style={styles.userInfoText}>Anders Jensen</Text>
+        <Text style={styles.userInfoText}>{`${user.firstName} ${user.lastName}`}</Text>
       </View>
       <TouchableOpacity style={styles.userInfo} onPress={handleLogout}>
         <Text style={styles.userInfoText2}>Log out</Text>

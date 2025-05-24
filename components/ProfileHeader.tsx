@@ -1,7 +1,13 @@
 import React from "react";
 import { View, Text, Image, StyleSheet } from "react-native";
+import { AppDispatch, RootState } from "../store/store";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function ProfileHeader() {
+  const dispatch = useDispatch<AppDispatch>();
+
+  const user = useSelector((state: RootState) => state.user.user_profile);
+
   return (
     <View style={styles.container}>
       <Image
@@ -9,8 +15,8 @@ export default function ProfileHeader() {
         style={styles.avatar}
       />
       <View>
-        <Text style={styles.name}>Anders Jensen</Text>
-        <Text style={styles.status}>Gold membership</Text>
+        <Text style={styles.name}>{`${user.firstName} ${user.lastName}`}</Text>
+        <Text style={styles.status}>{`${user.membership} membership`}</Text>
       </View>
     </View>
   );
