@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ScrollView,
   View,
@@ -13,6 +13,8 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
 import { ProfileStackParamList } from "../../Navigation";
 import AlertMessage from "../../components/AlertMessage";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store";
 
 export default function ProfileScreen() {
   type NavigationProp = NativeStackNavigationProp<
@@ -30,11 +32,22 @@ export default function ProfileScreen() {
     setOpenSection((prev) => (prev === sectionName ? null : sectionName));
   };
 
-  // User detail states
-  const [fullName, setFullName] = useState("John Super Doe");
-  const [email, setEmail] = useState("johnSuper@doe.com");
-  const [phone, setPhone] = useState("+45 12 34 56 78");
-  const [licensePlate, setLicensePlate] = useState("AD 87 123");
+  // Get user from Redux
+  const user = useSelector((state: RootState) => state.user.user_profile);
+
+  // Local state initialized empty — will be set from Redux user data
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [licensePlate, setLicensePlate] = useState("");
+
+  // When Redux user changes, update local state
+  useEffect(() => {
+    setFullName(user.firstName + " " + user.lastName);
+    setEmail(user.email);
+    setPhone(user.phone); // Not in Redux. We must add "setPhone(user.phone);" in userSlice
+    setLicensePlate(user.licensePlate);
+  }, [user]);
 
   // Editing toggle
   const [isEditing, setIsEditing] = useState(false);
