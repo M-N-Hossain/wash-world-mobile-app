@@ -5,14 +5,13 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Alert,
+  TextInput,
 } from "react-native";
 import ProfileHeader from "../../components/ProfileHeader";
 import ProfileSection from "../../components/ProfileSection";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
 import { ProfileStackParamList } from "../../Navigation";
-import EditableField from "../../components/EditableField";
 import AlertMessage from "../../components/AlertMessage";
 
 export default function ProfileScreen() {
@@ -27,16 +26,18 @@ export default function ProfileScreen() {
   };
 
   const [openSection, setOpenSection] = useState<string | null>(null);
-
   const toggleSection = (sectionName: string) => {
     setOpenSection((prev) => (prev === sectionName ? null : sectionName));
   };
 
-  {/* states for the editable inputs */}
+  // User detail states
   const [fullName, setFullName] = useState("John Super Doe");
   const [email, setEmail] = useState("johnSuper@doe.com");
   const [phone, setPhone] = useState("+45 12 34 56 78");
   const [licensePlate, setLicensePlate] = useState("AD 87 123");
+
+  // Editing toggle
+  const [isEditing, setIsEditing] = useState(false);
 
   // Alert state
   const [showAlert, setShowAlert] = useState(false);
@@ -44,52 +45,80 @@ export default function ProfileScreen() {
     setShowAlert(true);
   };
 
+  const handleSave = () => {
+    setIsEditing(false);
+    showSuccessAlert();
+    // todo: send all updated values to backend
+  };
+
   return (
     <ScrollView style={styles.container}>
       <ProfileHeader />
       <View style={styles.profileOptions}>
+        {/* USER DETAILS SECTION */}
         <ProfileSection
           title="User details"
           expanded={openSection === "user"}
           onPress={() => toggleSection("user")}
         >
-            <EditableField 
-              label="Full Name" 
-              value={fullName} 
-              onSave={(newValue) => {
-                setFullName(newValue);
-                showSuccessAlert();
-              }}
-            />
-            <EditableField
-              label="E-mail"
-              value={email}
-              onSave={(newValue) => {
-                setEmail(newValue);
-                showSuccessAlert();
-              }
-              }
-            />          
-            <EditableField
-              label="Phone number"
-              value={phone}
-              onSave={(newValue) => {
-                setPhone(newValue);
-                showSuccessAlert();
-              }
-              }
-            />          
-            <EditableField
-              label="License plate"
-              value={licensePlate}
-              onSave={(newValue) => {
-                setLicensePlate(newValue);
-                showSuccessAlert();
-              }
-              }
-            />          
+          {isEditing ? (
+            <>
+              <TextInput
+                style={styles.input}
+                value={fullName}
+                onChangeText={setFullName}
+                placeholder="Full Name"
+              />
+              <TextInput
+                style={styles.input}
+                value={email}
+                onChangeText={setEmail}
+                placeholder="E-mail"
+                keyboardType="email-address"
+              />
+              <TextInput
+                style={styles.input}
+                value={phone}
+                onChangeText={setPhone}
+                placeholder="Phone number"
+                keyboardType="phone-pad"
+              />
+              <TextInput
+                style={styles.input}
+                value={licensePlate}
+                onChangeText={setLicensePlate}
+                placeholder="License plate"
+              />
+              <TouchableOpacity onPress={handleSave}>
+                <View style={styles.saveButton}>
+                  <Text style={styles.saveText}>💾 Save</Text>
+                </View>
+              </TouchableOpacity>
+            </>
+          ) : (
+            <>
+              <View style={styles.innerBox}>
+                <Text>Full Name: {fullName}</Text>
+              </View>
+              <View style={styles.innerBox}>
+                <Text>E-mail: {email}</Text>
+              </View>
+              <View style={styles.innerBox}>
+                <Text>Phone number: {phone}</Text>
+              </View>
+              <View style={styles.innerBox}>
+                <Text>License plate: {licensePlate}</Text>
+              </View>
+              <TouchableOpacity onPress={() => setIsEditing(true)}>
+                <View style={styles.editButton}>
+                  <Text style={styles.editText}>✏️ Edit</Text>
+                </View>
+              </TouchableOpacity>
+            </>
+          )}
         </ProfileSection>
 
+        {/* PAYMENT METHOD SECTION */}
         <ProfileSection
           title="Payment method"
           expanded={openSection === "payment"}
@@ -109,6 +138,7 @@ export default function ProfileScreen() {
           </View>
         </ProfileSection>
 
+        {/* MANAGE MEMBERSHIP */}
         <ProfileSection
           title="Manage membership"
           expanded={openSection === "membership"}
@@ -131,6 +161,7 @@ export default function ProfileScreen() {
           </View>
         </ProfileSection>
 
+        {/* SETTINGS */}
         <ProfileSection
           title="Additional settings"
           expanded={openSection === "settings"}
@@ -141,6 +172,7 @@ export default function ProfileScreen() {
           </View>
         </ProfileSection>
 
+        {/* SUPPORT */}
         <ProfileSection
           title="Help & Support"
           expanded={openSection === "support"}
@@ -152,13 +184,14 @@ export default function ProfileScreen() {
         </ProfileSection>
       </View>
 
+      {/* Upgrade Membership Button */}
       <TouchableOpacity onPress={handleMembershipPress}>
         <View style={styles.upgradeButton}>
           <Text style={styles.upgradeText}>Upgrade Membership</Text>
         </View>
       </TouchableOpacity>
 
-      {/* Alert message */}
+      {/* Alert */}
       {showAlert && (
         <AlertMessage
           type="success"
@@ -185,6 +218,35 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderBottomWidth: 1,
     borderBottomColor: "#e0e0e0",
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    padding: 12,
+    marginVertical: 6,
+  },
+  saveButton: {
+    backgroundColor: "#06c167",
+    padding: 15,
+    borderRadius: 10,
+    marginTop: 10,
+    alignItems: "center",
+  },
+  saveText: {
+    color: "#fff",
+    fontWeight: "600",
+  },
+  editButton: {
+    backgroundColor: "#ccc",
+    padding: 15,
+    borderRadius: 10,
+    marginTop: 10,
+    alignItems: "center",
+  },
+  editText: {
+    color: "#333",
+    fontWeight: "600",
   },
   upgradeButton: {
     backgroundColor: "#06c167",
