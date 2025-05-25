@@ -58,11 +58,26 @@ export default function ProfileScreen() {
     setShowAlert(true);
   };
 
+  // Function to handle saving user details
   const handleSave = () => {
-    setIsEditing(false);
-    showSuccessAlert();
-    // todo: send all updated values to backend
+  setIsEditing(false);
+  showSuccessAlert();
+
+  // Prepare data to send to backend
+  const nameParts = fullName.trim().split(" ");
+  const firstName = nameParts[0];
+  const lastName = nameParts.slice(1).join(" "); // Handles middle names
+
+  const updatedUserData = {
+    firstName,
+    lastName,
+    email,
+    phone,
+    licensePlate,
   };
+
+  console.log("Ready to send to backend:", updatedUserData);
+};
 
   return (
     <ScrollView style={styles.container}>
