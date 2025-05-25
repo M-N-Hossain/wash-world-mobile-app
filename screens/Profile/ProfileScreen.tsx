@@ -15,6 +15,7 @@ import { ProfileStackParamList } from "../../Navigation";
 import AlertMessage from "../../components/AlertMessage";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
+import { UserAPI } from "../../api/UserAPI";
 
 export default function ProfileScreen() {
   type NavigationProp = NativeStackNavigationProp<
@@ -32,8 +33,9 @@ export default function ProfileScreen() {
     setOpenSection((prev) => (prev === sectionName ? null : sectionName));
   };
 
-  // Get user from Redux
+  // Get user and token from Redux
   const user = useSelector((state: RootState) => state.user.user_profile);
+  const token = useSelector((state: RootState) => state.user.token);
 
   // Local state initialized empty — will be set from Redux user data
   const [fullName, setFullName] = useState("");
@@ -45,7 +47,7 @@ export default function ProfileScreen() {
   useEffect(() => {
     setFullName(user.firstName + " " + user.lastName);
     setEmail(user.email);
-    setPhone(user.phone); // Not in Redux. We must add "setPhone(user.phone);" in userSlice
+    setPhone(user.phone); // Not in Redux. Add setPhone(user.phone) in userSlice later
     setLicensePlate(user.licensePlate);
   }, [user]);
 
@@ -59,25 +61,38 @@ export default function ProfileScreen() {
   };
 
   // Function to handle saving user details
-  const handleSave = () => {
-  setIsEditing(false);
-  showSuccessAlert();
+  const handleSave = async () => {
+    setIsEditing(false);
 
-  // Prepare data to send to backend
-  const nameParts = fullName.trim().split(" ");
-  const firstName = nameParts[0];
-  const lastName = nameParts.slice(1).join(" "); // Handles middle names
+    // Prepare data to send to backend
+    const nameParts = fullName.trim().split(" ");
+    const firstName = nameParts[0];
+    const lastName = nameParts.slice(1).join(" "); // Handles middle names
 
-  const updatedUserData = {
-    firstName,
-    lastName,
-    email,
-    phone,
-    licensePlate,
+    const updatedUserData = {
+      firstName,
+      lastName,
+      email,
+      phone,
+      licensePlate,
+    };
+
+    try {
+      // We will add the api call to update user profile directly in the UserAPI file when we merge this branch into dev
+      // Call backend update
+      const response = await UserAPI.updateUserProfile(token, updatedUserData);
+      console.log("Backend response:", response);
+
+      // Show success alert
+      showSuccessAlert();
+
+      // TODO: Do we need to update Redux with the new user?
+
+    } catch (error) {
+      console.error("Failed to update user profile", error);
+      // Optionally error alert/message here
+    }
   };
-
-  console.log("Ready to send to backend:", updatedUserData);
-};
 
   return (
     <ScrollView style={styles.container}>
