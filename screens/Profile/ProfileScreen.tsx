@@ -56,8 +56,14 @@ export default function ProfileScreen() {
 
   // Alert state
   const [showAlert, setShowAlert] = useState(false);
+  const [showError, setShowError] = useState(false); // 👈 error alert toggle
+
   const showSuccessAlert = () => {
     setShowAlert(true);
+  };
+
+  const showErrorAlert = () => {
+    setShowError(true);
   };
 
   // Function to handle saving user details
@@ -82,16 +88,12 @@ export default function ProfileScreen() {
       // Call backend update
       const response = await UserAPI.updateUserProfile(token, updatedUserData);
       console.log("Backend response:", response);
-
-      // Show success alert
       showSuccessAlert();
-
-      // TODO: Do we need to update Redux with the new user?
-
     } catch (error) {
       console.error("Failed to update user profile", error);
-      // Optionally error alert/message here
+      showErrorAlert(); 
     }
+    // TODO: Do we need to update Redux with the new user?
   };
 
   return (
@@ -234,12 +236,19 @@ export default function ProfileScreen() {
         </View>
       </TouchableOpacity>
 
-      {/* Alert */}
+      {/* Alerts */}
       {showAlert && (
         <AlertMessage
           type="success"
           message="Changes saved successfully!"
           onHide={() => setShowAlert(false)}
+        />
+      )}
+      {showError && (
+        <AlertMessage
+          type="error"
+          message="Failed to save changes."
+          onHide={() => setShowError(false)}
         />
       )}
     </ScrollView>
