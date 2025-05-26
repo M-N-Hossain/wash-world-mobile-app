@@ -12,6 +12,7 @@ import { Mail, Lock, ChevronLeft } from "lucide-react-native";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../store/store";
 import { signup } from "../../redux/userSlice";
+import { Picker } from "@react-native-picker/picker";
 
 export default function RegisterScreen() {
   const dispatch = useDispatch<AppDispatch>();
@@ -98,18 +99,18 @@ export default function RegisterScreen() {
       </View>
 
       {/* Membership Input */}
-      <View style={styles.inputContainer}>
-        <TextInput
-          placeholder="brillant, premium or gold"
-          style={styles.textInput}
-          placeholderTextColor="#999"
-          keyboardType="default"
-          value={membership}
-          onChangeText={setMembership}
-        />
-        <View style={styles.iconWrapper}>
-          <Mail size={20} />
-        </View>
+      <View style={styles.pickerContainer}>
+        <Picker
+          selectedValue={membership}
+          onValueChange={(itemValue) => setMembership(itemValue)}
+          style={styles.picker}
+          mode="dropdown"
+        >
+          <Picker.Item label="Select Membership" value="" />
+          <Picker.Item label="Brilliant" value="brilliant" />
+          <Picker.Item label="Premium" value="premium" />
+          <Picker.Item label="Gold" value="gold" />
+        </Picker>
       </View>
 
       {/* Email Input */}
@@ -240,5 +241,17 @@ const styles = StyleSheet.create({
   link: {
     color: "#0AC267",
     fontWeight: "bold",
+  },
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    marginTop: 12,
+    overflow: "hidden",
+  },
+  picker: {
+    height: 50,
+    width: "100%",
+    color: "#000",
   },
 });
