@@ -1,4 +1,4 @@
-import React from "react";
+import React, { use } from "react";
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../store/store";
 import { signup } from "../../redux/userSlice";
 import { Picker } from "@react-native-picker/picker";
+import { useGetSubscriptions } from "../../hooks/useGetSubscriptions";
 
 export default function RegisterScreen() {
   const dispatch = useDispatch<AppDispatch>();
@@ -37,6 +38,9 @@ export default function RegisterScreen() {
       })
     );
   };
+
+  const { isLoading, isError, data, error } = useGetSubscriptions();
+  console.log("Subscriptions data:", data);
 
   return (
     <SafeAreaView style={styles.container}>
