@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import ExtendedTop from "./ExtendedTop";
 import ExtendedBottom from "./ExtendedBottom";
 import { useRegisterWash } from "../../hooks/useRegisterWash";
@@ -42,7 +42,7 @@ export default function MapCalloutExtended({
   };
 
   return (
-    <View>
+    <View style={styles.container}>
       <ExtendedTop
         address={address}
         name={name}
@@ -55,3 +55,14 @@ export default function MapCalloutExtended({
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    justifyContent: "space-between",
+    alignItems: "center",
+    // backgroundColor: "#FFFFFF",
+    width: "100%",
+    height: "100%",
+  }
+
+})

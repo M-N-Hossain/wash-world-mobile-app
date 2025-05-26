@@ -29,11 +29,12 @@ export default function ExtendedBottom({
 
 const styles = StyleSheet.create({
   container: {
+    position: "absolute",
     backgroundColor: "#FFFFFF",
     width: "100%",
-    top: 525,
     alignItems: "center",
     paddingTop: 20,
+    bottom: 0,
     paddingBottom: 20,
     gap: 20,
   },
