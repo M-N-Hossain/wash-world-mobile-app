@@ -3,7 +3,7 @@ export class CreateUserDto {
     public firstName: string,
     public lastName: string,
     public licensePlate: string,
-    public membership: string,
+    public subscriptionId: string,
     public email: string,
     public password: string
   ) {}

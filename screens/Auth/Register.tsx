@@ -21,9 +21,9 @@ export default function RegisterScreen() {
   const [firstName, setFirstName] = React.useState("");
   const [lastName, setLastName] = React.useState("");
   const [licensePlate, setLicensePlate] = React.useState("");
-  const [membership, setMembership] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [subscriptionId, setSubscriptionId] = React.useState("");
 
   // Handle register action
   const handleRegister = () => {
@@ -32,11 +32,12 @@ export default function RegisterScreen() {
         firstName,
         lastName,
         licensePlate,
-        membership,
         email,
         password,
+        subscriptionId
       })
     );
+    
   };
 
   const { isLoading, isError, data, error } = useGetSubscriptions();
@@ -103,19 +104,25 @@ export default function RegisterScreen() {
       </View>
 
       {/* Membership Input */}
-      <View style={styles.pickerContainer}>
-        <Picker
-          selectedValue={membership}
-          onValueChange={(itemValue) => setMembership(itemValue)}
-          style={styles.picker}
-          mode="dropdown"
-        >
-          <Picker.Item label="Select Membership" value="" />
-          <Picker.Item label="Brilliant" value="brilliant" />
-          <Picker.Item label="Premium" value="premium" />
-          <Picker.Item label="Gold" value="gold" />
-        </Picker>
-      </View>
+      {isLoading ? (
+        <Text>Loading memberships...</Text>
+      ) : error ? (
+        <Text>Error loading memberships</Text>
+      ) : (
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={subscriptionId}
+            onValueChange={(itemValue) => setSubscriptionId(itemValue)}
+            style={styles.picker}
+          >
+            <Picker.Item label="Select membership" value="" />
+            {data?.map((sub) => (
+              <Picker.Item key={sub.id} label={sub.tierName} value={sub.id} />
+            ))}
+          </Picker>
+        </View>
+      )}
+
 
       {/* Email Input */}
       <View style={styles.inputContainer}>
