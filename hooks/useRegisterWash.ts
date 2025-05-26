@@ -4,14 +4,16 @@ import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import axios from "axios";
 
-const API_URL = `${process.env.URL}/wash`;
+import Constants from "expo-constants";
+
+const API_URL = Constants.expoConfig?.extra?.API_URL;
 
 export const useRegisterWash = () => {
   const token = useSelector((state: RootState) => state.user.token);
 
   return useMutation({
     mutationFn: async (wash: WashEntity) => {
-      const response = await axios.post(API_URL, wash, {
+      const response = await axios.post(`${API_URL}/wash`, wash, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",

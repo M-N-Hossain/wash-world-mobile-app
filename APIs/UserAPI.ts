@@ -2,8 +2,12 @@ import axios from "axios";
 import { CreateUserDto } from "../redux/CreateUserDto";
 import { LoginUserDto } from "../redux/LoginUserDto";
 
+import Constants from "expo-constants";
+
+const API_URL = Constants.expoConfig?.extra?.API_URL;
+
 export class UserAPI {
-    static API_URL = `${process.env.URL}`;
+  static API_URL = API_URL
 
   static async loginUser(userDto: LoginUserDto) {
     try {
