@@ -4,14 +4,14 @@ import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import axios from "axios";
 
-const WASH_URL = "http://10.0.2.2:3000/wash";
+const API_URL = `${process.env.URL}/wash`;
 
 export const useRegisterWash = () => {
   const token = useSelector((state: RootState) => state.user.token);
 
   return useMutation({
     mutationFn: async (wash: WashEntity) => {
-      const response = await axios.post(WASH_URL, wash, {
+      const response = await axios.post(API_URL, wash, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",

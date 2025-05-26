@@ -3,7 +3,7 @@ import { CreateUserDto } from "../redux/CreateUserDto";
 import { LoginUserDto } from "../redux/LoginUserDto";
 
 export class UserAPI {
-  static API_URL = "http://10.0.2.2:3000";
+    static API_URL = `${process.env.URL}`;
 
   static async loginUser(userDto: LoginUserDto) {
     try {
