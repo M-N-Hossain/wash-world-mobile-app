@@ -12,7 +12,7 @@ import { Mail, Lock, ChevronLeft } from "lucide-react-native";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../store/store";
 import { signup } from "../../redux/userSlice";
-import { Picker } from "@react-native-picker/picker";
+import RNPickerSelect from "react-native-picker-select";
 import { useGetSubscriptions } from "../../hooks/useGetSubscriptions";
 
 export default function RegisterScreen() {
@@ -34,10 +34,9 @@ export default function RegisterScreen() {
         licensePlate,
         email,
         password,
-        subscriptionId
+        subscriptionId: "357e58b3-2b67-423a-8979-a9fd1d45507b",
       })
     );
-    
   };
 
   const { isLoading, isError, data, error } = useGetSubscriptions();
@@ -110,19 +109,35 @@ export default function RegisterScreen() {
         <Text>Error loading memberships</Text>
       ) : (
         <View style={styles.pickerContainer}>
-          <Picker
-            selectedValue={subscriptionId}
-            onValueChange={(itemValue) => setSubscriptionId(itemValue)}
-            style={styles.picker}
-          >
-            <Picker.Item label="Select membership" value="" />
-            {data?.map((sub) => (
-              <Picker.Item key={sub.id} label={sub.tierName} value={sub.id} />
-            ))}
-          </Picker>
+          <RNPickerSelect
+            onValueChange={setSubscriptionId}
+            value={subscriptionId}
+            placeholder={{ label: "Select membership", value: "" }}
+            items={
+              data?.map((sub) => ({ label: sub.tierName, value: sub.id })) || []
+            }
+            style={{
+              inputIOS: {
+                fontSize: 16,
+                paddingVertical: 12,
+                paddingHorizontal: 10,
+                borderWidth: 0,
+                color: "#000",
+              },
+              inputAndroid: {
+                fontSize: 16,
+                paddingHorizontal: 10,
+                paddingVertical: 8,
+                color: "#000",
+              },
+              placeholder: {
+                color: "#999",
+              },
+            }}
+            useNativeAndroidPickerStyle={false}
+          />
         </View>
       )}
-
 
       {/* Email Input */}
       <View style={styles.inputContainer}>
@@ -258,11 +273,5 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     borderRadius: 8,
     marginTop: 12,
-    overflow: "hidden",
-  },
-  picker: {
-    height: 50,
-    width: "100%",
-    color: "#000",
   },
 });
