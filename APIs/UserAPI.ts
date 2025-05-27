@@ -1,11 +1,19 @@
 import axios from "axios";
 import { CreateUserDto } from "../redux/CreateUserDto";
 import { LoginUserDto } from "../redux/LoginUserDto";
+import { jwtDecode } from "jwt-decode";
 
 import Constants from "expo-constants";
 
 const API_URL = Constants.expoConfig?.extra?.API_URL;
-
+    type DecodedToken = {
+      email: string;
+      exp: number;
+      iat: number;
+      licensePlate: string;
+      subscriptionId: string;
+      id: string;
+    };
 export class UserAPI {
   static API_URL = API_URL
 
@@ -30,8 +38,10 @@ export class UserAPI {
   }
 
   static async getUserById(token: string) {
+    
     try {
-      const response = await axios.get(`${this.API_URL}/users/me`, {
+      const decodedToken = jwtDecode(token) as DecodedToken;
+      const response = await axios.get(`${this.API_URL}/api/users/${decodedToken.id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

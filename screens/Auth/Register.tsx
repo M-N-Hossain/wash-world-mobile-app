@@ -1,4 +1,4 @@
-import React from "react";
+import React, { use } from "react";
 import {
   View,
   Text,
@@ -12,6 +12,8 @@ import { Mail, Lock, ChevronLeft } from "lucide-react-native";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../store/store";
 import { signup } from "../../redux/userSlice";
+import { Picker } from "@react-native-picker/picker";
+import { useGetSubscriptions } from "../../hooks/useGetSubscriptions";
 
 export default function RegisterScreen() {
   const dispatch = useDispatch<AppDispatch>();
@@ -19,9 +21,9 @@ export default function RegisterScreen() {
   const [firstName, setFirstName] = React.useState("");
   const [lastName, setLastName] = React.useState("");
   const [licensePlate, setLicensePlate] = React.useState("");
-  const [membership, setMembership] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [subscriptionId, setSubscriptionId] = React.useState("");
 
   // Handle register action
   const handleRegister = () => {
@@ -30,12 +32,16 @@ export default function RegisterScreen() {
         firstName,
         lastName,
         licensePlate,
-        membership,
         email,
         password,
+        subscriptionId
       })
     );
+    
   };
+
+  const { isLoading, isError, data, error } = useGetSubscriptions();
+  console.log("Subscriptions data:", data);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -98,19 +104,25 @@ export default function RegisterScreen() {
       </View>
 
       {/* Membership Input */}
-      <View style={styles.inputContainer}>
-        <TextInput
-          placeholder="brillant, premium or gold"
-          style={styles.textInput}
-          placeholderTextColor="#999"
-          keyboardType="default"
-          value={membership}
-          onChangeText={setMembership}
-        />
-        <View style={styles.iconWrapper}>
-          <Mail size={20} />
+      {isLoading ? (
+        <Text>Loading memberships...</Text>
+      ) : error ? (
+        <Text>Error loading memberships</Text>
+      ) : (
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={subscriptionId}
+            onValueChange={(itemValue) => setSubscriptionId(itemValue)}
+            style={styles.picker}
+          >
+            <Picker.Item label="Select membership" value="" />
+            {data?.map((sub) => (
+              <Picker.Item key={sub.id} label={sub.tierName} value={sub.id} />
+            ))}
+          </Picker>
         </View>
-      </View>
+      )}
+
 
       {/* Email Input */}
       <View style={styles.inputContainer}>
@@ -240,5 +252,17 @@ const styles = StyleSheet.create({
   link: {
     color: "#0AC267",
     fontWeight: "bold",
+  },
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    marginTop: 12,
+    overflow: "hidden",
+  },
+  picker: {
+    height: 50,
+    width: "100%",
+    color: "#000",
   },
 });
