@@ -177,18 +177,20 @@ export default function Navigation() {
     exp: number;
   };
 
-  // Check for token expiration on app load and setup periodic checks
+  // Check for token expiration on app load
   useEffect(() => {
     const checkTokenExpiration = async () => {
       try {
         const stored = await SecureStore.getItemAsync("jwt");
         
         if (!stored) {
+          // No token found in storage
           dispatch(logout());
           return;
         }
         
         try {
+          // Parse the token correctly - it's stored as a plain string
           const decoded: DecodedToken = jwtDecode(stored);
           const now = Math.floor(Date.now() / 1000); // current time in seconds
           const timeUntilExpiry = decoded.exp - now;
@@ -206,18 +208,6 @@ export default function Navigation() {
             dispatch(reloadJwtFromStorage(stored));
             dispatch(getUser(stored));
           }
-          
-          // Set a timer to check again just before expiry
-          // Add a 10-second buffer to ensure we logout before actual expiration
-          const timeoutDuration = Math.max((timeUntilExpiry - 10) * 1000, 0);
-          if (timeoutDuration > 0) {
-            const expiryTimer = setTimeout(() => {
-              console.log("Token expiration timer triggered");
-              dispatch(logout());
-            }, timeoutDuration);
-            
-            return () => clearTimeout(expiryTimer);
-          }
         } catch (decodeError) {
           console.error("Error decoding token:", decodeError);
           await SecureStore.deleteItemAsync("jwt");
@@ -230,11 +220,7 @@ export default function Navigation() {
     };
 
     checkTokenExpiration();
-    
-    // Also set up a periodic check every minute as a safety measure
-    const intervalId = setInterval(checkTokenExpiration, 60000);
-    return () => clearInterval(intervalId);
-  }, [dispatch, token]);
+  }, [dispatch]);
 
   return (
     <NavigationContainer>
