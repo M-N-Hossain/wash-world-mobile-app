@@ -52,4 +52,22 @@ export class UserAPI {
       throw error;
     }
   }
+  static async updateUserProfile(token: string, userData: any) {
+    try {
+      const decodedToken = jwtDecode(token) as DecodedToken;
+      const response = await axios.put(
+        `${this.API_URL}/api/users/${decodedToken.id}`,
+        userData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error updating user profile:", error);
+      throw error;
+    }
+  }
 }

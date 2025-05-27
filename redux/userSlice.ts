@@ -104,6 +104,12 @@ const userSlice = createSlice({
       // Remove token from secure storage
       SecureStore.deleteItemAsync("jwt");
     },
+    updateUserProfile: (state, action) => {
+      state.user_profile = {
+        ...state.user_profile, 
+        ...action.payload
+      };
+    }
   },
   extraReducers: (builder) => {
     builder.addCase(login.fulfilled, (state, action) => {
@@ -154,5 +160,5 @@ const userSlice = createSlice({
   },
 });
 
-export const { reloadJwtFromStorage, logout } = userSlice.actions;
+export const { reloadJwtFromStorage, logout, updateUserProfile } = userSlice.actions;
 export default userSlice.reducer;
