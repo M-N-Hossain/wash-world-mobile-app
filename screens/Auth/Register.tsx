@@ -14,9 +14,17 @@ import { AppDispatch } from "../../store/store";
 import { signup } from "../../redux/userSlice";
 import RNPickerSelect from "react-native-picker-select";
 import { useGetSubscriptions } from "../../hooks/useGetSubscriptions";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { AuthStackParamList } from "../../Navigation";
 
 export default function RegisterScreen() {
   const dispatch = useDispatch<AppDispatch>();
+  type NavigationProp = NativeStackNavigationProp<
+    AuthStackParamList,
+    "RegisterScreen"
+  >;
+  const navigation = useNavigation<NavigationProp>();
 
   const [firstName, setFirstName] = React.useState("");
   const [lastName, setLastName] = React.useState("");
@@ -34,7 +42,8 @@ export default function RegisterScreen() {
         licensePlate,
         email,
         password,
-        subscriptionId: "357e58b3-2b67-423a-8979-a9fd1d45507b",
+        subscriptionId,
+
       })
     );
   };
@@ -44,13 +53,6 @@ export default function RegisterScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Back Button */}
-      <Pressable style={styles.backButton}>
-        <View style={styles.iconWrapper}>
-          <ChevronLeft size={24} />
-        </View>
-      </Pressable>
-
       {/* Title + Subtitle */}
       <Text style={styles.title}>Welcome to Wash World</Text>
       <Text style={styles.subtitle}>
@@ -67,9 +69,6 @@ export default function RegisterScreen() {
           value={firstName}
           onChangeText={setFirstName}
         />
-        <View style={styles.iconWrapper}>
-          <Mail size={20} />
-        </View>
       </View>
 
       {/* LastName Input */}
@@ -82,9 +81,6 @@ export default function RegisterScreen() {
           value={lastName}
           onChangeText={setLastName}
         />
-        <View style={styles.iconWrapper}>
-          <Mail size={20} />
-        </View>
       </View>
 
       {/* LicensePlate Input */}
@@ -97,9 +93,6 @@ export default function RegisterScreen() {
           value={licensePlate}
           onChangeText={setLicensePlate}
         />
-        <View style={styles.iconWrapper}>
-          <Mail size={20} />
-        </View>
       </View>
 
       {/* Membership Input */}
@@ -209,7 +202,12 @@ export default function RegisterScreen() {
       <View style={styles.footer}>
         <Text style={styles.footerText}>
           Already have an account?{" "}
-          <Text style={styles.link}>Login instead</Text>
+          <Text
+            style={styles.link}
+            onPress={() => navigation.navigate("LoginScreen")}
+          >
+            Login instead
+          </Text>
         </Text>
       </View>
     </SafeAreaView>
