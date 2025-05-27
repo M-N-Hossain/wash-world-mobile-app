@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { use } from "react";
 import {
   View,
   Text,
@@ -7,10 +7,42 @@ import {
   StyleSheet,
   SafeAreaView,
   Pressable,
-} from 'react-native';
-import { Mail, Lock, ChevronLeft } from 'lucide-react-native';
+} from "react-native";
+import { Mail, Lock, ChevronLeft } from "lucide-react-native";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../store/store";
+import { signup } from "../../redux/userSlice";
+import { Picker } from "@react-native-picker/picker";
+import { useGetSubscriptions } from "../../hooks/useGetSubscriptions";
 
 export default function RegisterScreen() {
+  const dispatch = useDispatch<AppDispatch>();
+
+  const [firstName, setFirstName] = React.useState("");
+  const [lastName, setLastName] = React.useState("");
+  const [licensePlate, setLicensePlate] = React.useState("");
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [subscriptionId, setSubscriptionId] = React.useState("");
+
+  // Handle register action
+  const handleRegister = () => {
+    dispatch(
+      signup({
+        firstName,
+        lastName,
+        licensePlate,
+        email,
+        password,
+        subscriptionId
+      })
+    );
+    
+  };
+
+  const { isLoading, isError, data, error } = useGetSubscriptions();
+  console.log("Subscriptions data:", data);
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Back Button */}
@@ -26,6 +58,72 @@ export default function RegisterScreen() {
         Sign up to unlock premium washes and exclusive deals—fast and easy!
       </Text>
 
+      {/* FirstName Input */}
+      <View style={styles.inputContainer}>
+        <TextInput
+          placeholder="First Name"
+          style={styles.textInput}
+          placeholderTextColor="#999"
+          keyboardType="default"
+          value={firstName}
+          onChangeText={setFirstName}
+        />
+        <View style={styles.iconWrapper}>
+          <Mail size={20} />
+        </View>
+      </View>
+
+      {/* LastName Input */}
+      <View style={styles.inputContainer}>
+        <TextInput
+          placeholder="Last Name"
+          style={styles.textInput}
+          placeholderTextColor="#999"
+          keyboardType="default"
+          value={lastName}
+          onChangeText={setLastName}
+        />
+        <View style={styles.iconWrapper}>
+          <Mail size={20} />
+        </View>
+      </View>
+
+      {/* LicensePlate Input */}
+      <View style={styles.inputContainer}>
+        <TextInput
+          placeholder="License Plate"
+          style={styles.textInput}
+          placeholderTextColor="#999"
+          keyboardType="default"
+          value={licensePlate}
+          onChangeText={setLicensePlate}
+        />
+        <View style={styles.iconWrapper}>
+          <Mail size={20} />
+        </View>
+      </View>
+
+      {/* Membership Input */}
+      {isLoading ? (
+        <Text>Loading memberships...</Text>
+      ) : error ? (
+        <Text>Error loading memberships</Text>
+      ) : (
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={subscriptionId}
+            onValueChange={(itemValue) => setSubscriptionId(itemValue)}
+            style={styles.picker}
+          >
+            <Picker.Item label="Select membership" value="" />
+            {data?.map((sub) => (
+              <Picker.Item key={sub.id} label={sub.tierName} value={sub.id} />
+            ))}
+          </Picker>
+        </View>
+      )}
+
+
       {/* Email Input */}
       <View style={styles.inputContainer}>
         <TextInput
@@ -33,6 +131,8 @@ export default function RegisterScreen() {
           style={styles.textInput}
           placeholderTextColor="#999"
           keyboardType="email-address"
+          value={email}
+          onChangeText={setEmail}
         />
         <View style={styles.iconWrapper}>
           <Mail size={20} />
@@ -46,6 +146,8 @@ export default function RegisterScreen() {
           style={styles.textInput}
           secureTextEntry
           placeholderTextColor="#999"
+          value={password}
+          onChangeText={setPassword}
         />
         <View style={styles.iconWrapper}>
           <Lock size={20} />
@@ -66,14 +168,18 @@ export default function RegisterScreen() {
       </View>
 
       {/* Register Button */}
-      <TouchableOpacity style={[styles.button, styles.buttonDisabled]}>
+      <TouchableOpacity
+        style={[styles.button, styles.buttonDisabled]}
+        onPress={handleRegister}
+      >
         <Text style={styles.buttonText}>Register</Text>
       </TouchableOpacity>
 
       {/* Footer */}
       <View style={styles.footer}>
         <Text style={styles.footerText}>
-          Already have an account? <Text style={styles.link}>Login instead</Text>
+          Already have an account?{" "}
+          <Text style={styles.link}>Login instead</Text>
         </Text>
       </View>
     </SafeAreaView>
@@ -83,7 +189,7 @@ export default function RegisterScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     padding: 24,
   },
   backButton: {
@@ -91,29 +197,29 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontWeight: "bold",
+    textAlign: "center",
   },
   subtitle: {
     fontSize: 14,
-    textAlign: 'center',
-    color: '#666',
+    textAlign: "center",
+    color: "#666",
     marginVertical: 12,
   },
   inputContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderRadius: 8,
     paddingHorizontal: 12,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 12,
   },
   textInput: {
     flex: 1,
     paddingVertical: 12,
     fontSize: 16,
-    color: '#000',
+    color: "#000",
   },
   iconWrapper: {
     marginLeft: 8,
@@ -121,30 +227,42 @@ const styles = StyleSheet.create({
   button: {
     borderRadius: 8,
     paddingVertical: 16,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 24,
   },
   buttonDisabled: {
-    backgroundColor: '#999',
+    backgroundColor: "#999",
   },
   buttonActive: {
-    backgroundColor: '#0AC267',
+    backgroundColor: "#0AC267",
   },
   buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: "#fff",
+    fontWeight: "bold",
     fontSize: 16,
   },
   footer: {
     marginTop: 24,
-    alignItems: 'center',
+    alignItems: "center",
   },
   footerText: {
-    textAlign: 'center',
-    color: '#333',
+    textAlign: "center",
+    color: "#333",
   },
   link: {
-    color: '#0AC267',
-    fontWeight: 'bold',
+    color: "#0AC267",
+    fontWeight: "bold",
+  },
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    marginTop: 12,
+    overflow: "hidden",
+  },
+  picker: {
+    height: 50,
+    width: "100%",
+    color: "#000",
   },
 });

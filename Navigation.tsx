@@ -1,17 +1,23 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
-import React from "react";
+import React, { useEffect } from "react";
+import { House, MapPin, User } from "lucide-react-native";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "./store/store";
+import * as SecureStore from "expo-secure-store";
+import { getUser, reloadJwtFromStorage } from "./redux/userSlice";
+import LoadingScreen from "./components/LoadingScreen";
 
 ///////////////////// Screens /////////////////////
-// import LoginScreen from "./screens/Auth/Login";
-// import RegisterScreen from "./screens/Auth/Register";
-// import OnboardingScreen from "./screens/Onboarding/OnboardingScreen";
+import LoginScreen from "./screens/Auth/Login";
+import RegisterScreen from "./screens/Auth/Register";
+import OnboardingScreen from "./screens/Onboarding/OnboardingScreen";
 import MembershipOptionsScreen from "./screens/Profile/MembershipOptionsScreen";
 import ProfileScreen from "./screens/Profile/ProfileScreen";
 import HomePage from "./screens/HomePage";
 import Locations from "./screens/locations";
-import { House, MapPin, User } from "lucide-react-native";
+import History from "./screens/History";
 
 // This is the type for the Profile stack
 export type ProfileStackParamList = {
@@ -23,7 +29,48 @@ export type ProfileStackParamList = {
 export type HomepageStackParamList = {
   Homepage: undefined;
   Locations: undefined;
+  History: undefined;
 };
+
+// This is the type for the Auth stack
+export type AuthStackParamList = {
+  LoginScreen: undefined;
+  RegisterScreen: undefined;
+  OnboardingScreen: undefined;
+};
+
+// Auth stack
+const AuthStackNavigator = createNativeStackNavigator<AuthStackParamList>();
+
+function AuthStack() {
+  return (
+    <AuthStackNavigator.Navigator>
+      {/* <AuthStackNavigator.Screen
+        name="OnboardingScreen"
+        component={OnboardingScreen}
+        options={{
+          headerShown: false,
+        }}
+      /> */}
+      <AuthStackNavigator.Screen
+        name="LoginScreen"
+        component={LoginScreen}
+        options={{
+          title: "Login",
+          headerShown: false,
+        }}
+      />
+      <AuthStackNavigator.Screen
+        name="RegisterScreen"
+        component={RegisterScreen}
+        options={{
+          title: "Register",
+          headerShown: false,
+        }}
+      />
+    </AuthStackNavigator.Navigator>
+  );
+}
 
 // Profile stack
 const ProfileStackNavigator =
@@ -59,6 +106,16 @@ function HomepageStack() {
     <HomepageStackNavigator.Navigator screenOptions={{ headerShown: false }}>
       <HomepageStackNavigator.Screen name="Homepage" component={HomePage} />
       <HomepageStackNavigator.Screen name="Locations" component={Locations} />
+      <HomepageStackNavigator.Screen
+        name="History"
+        component={History}
+        options={{
+          title: "Wash History",
+          headerShown: true,
+          headerStyle: { backgroundColor: "#0ac267" },
+          headerTintColor: "#fff",
+        }}
+      />
     </HomepageStackNavigator.Navigator>
   );
 }
@@ -68,43 +125,87 @@ const Tab = createBottomTabNavigator();
 
 function BasicTabs() {
   return (
-    <Tab.Navigator screenOptions={{ headerShown: false }}>
+    <Tab.Navigator
+      screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: "#0ac267",
+        tabBarInactiveTintColor: "#666666",
+      }}
+    >
       <Tab.Screen
         name="Home"
         component={HomepageStack}
         options={{
-          tabBarIcon: () => <House color={"#000000"} />,
+          tabBarIcon: ({ focused }) => (
+            <House color={focused ? "#0ac267" : "#666666"} />
+          ),
         }}
       />
       <Tab.Screen
         name="Locations"
         component={Locations}
         options={{
-          tabBarIcon: () => <MapPin color={"#000000"} />,
+          tabBarIcon: ({ focused }) => (
+            <MapPin color={focused ? "#0ac267" : "#666666"} />
+          ),
         }}
       />
       <Tab.Screen
         name="Profile"
         component={ProfileStack}
         options={{
-          tabBarIcon: () => <User color={"#000000"} />,
+          tabBarIcon: ({ focused }) => (
+            <User color={focused ? "#0ac267" : "#666666"} />
+          ),
         }}
       />
     </Tab.Navigator>
   );
 }
 
-// Navigation used for the logged in user
-const BasisNavigation = () => (
-  <NavigationContainer>
-    <BasicTabs />
-  </NavigationContainer>
-);
-
 export default function Navigation() {
+  const token = useSelector((state: RootState) => state.user.token);
+  const isLoadingUser = useSelector(
+    (state: RootState) => state.user.isLoadingUser
+  );
+  const user_profile = useSelector(
+    (state: RootState) => state.user.user_profile
+  );
+
+  const dispatch = useDispatch<AppDispatch>();
+
+  // Initialize auth state from secure storage
+  useEffect(() => {
+    const initAuth = async () => {
+      try {
+        const stored = await SecureStore.getItemAsync("jwt");
+        if (stored) {
+          const parsedToken = JSON.parse(stored);
+          if (parsedToken && typeof parsedToken === "string") {
+            dispatch(reloadJwtFromStorage(parsedToken));
+            setTimeout(() => {
+              dispatch(getUser(parsedToken));
+            }, 100);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to initialize auth:", err);
+      }
+    };
+    initAuth();
+  }, []);
+
   return (
-    <>
-      <BasisNavigation />
-    </>
+    <NavigationContainer>
+      {token ? (
+        isLoadingUser || user_profile.id === 0 ? (
+          <LoadingScreen />
+        ) : (
+          <BasicTabs />
+        )
+      ) : (
+        <AuthStack />
+      )}
+    </NavigationContainer>
   );
 }
