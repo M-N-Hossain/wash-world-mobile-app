@@ -12,7 +12,7 @@ import { Mail, Lock, ChevronLeft } from "lucide-react-native";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../store/store";
 import { signup } from "../../redux/userSlice";
-import { Picker } from "@react-native-picker/picker";
+import RNPickerSelect from "react-native-picker-select";
 import { useGetSubscriptions } from "../../hooks/useGetSubscriptions";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -43,6 +43,7 @@ export default function RegisterScreen() {
         email,
         password,
         subscriptionId,
+
       })
     );
   };
@@ -101,16 +102,48 @@ export default function RegisterScreen() {
         <Text>Error loading memberships</Text>
       ) : (
         <View style={styles.pickerContainer}>
-          <Picker
-            selectedValue={subscriptionId}
-            onValueChange={(itemValue) => setSubscriptionId(itemValue)}
-            style={styles.picker}
-          >
-            <Picker.Item label="Select membership" value="" />
-            {data?.map((sub) => (
-              <Picker.Item key={sub.id} label={sub.tierName} value={sub.id} />
-            ))}
-          </Picker>
+          <RNPickerSelect
+            onValueChange={setSubscriptionId}
+            value={subscriptionId}
+            placeholder={{ label: "Select membership", value: "" }}
+            items={
+              data?.map((sub) => ({ label: sub.tierName, value: sub.id })) || []
+            }
+            style={{
+              inputIOS: {
+                fontSize: 16,
+                paddingVertical: 12,
+                paddingHorizontal: 10,
+                color: "#000",
+              },
+              inputAndroid: {
+                fontSize: 16,
+                paddingHorizontal: 10,
+                paddingVertical: 8,
+                color: "#000",
+              },
+              placeholder: {
+                color: "#999",
+              },
+              iconContainer: {
+                top: 16,
+                right: 12,
+              },
+            }}
+            useNativeAndroidPickerStyle={false}
+            Icon={() => (
+              <View style={{ top: 0, right: 2, position: "absolute" }}>
+                <ChevronLeft
+                  size={20}
+                  style={{ transform: [{ rotate: "270deg" }] }}
+                  color="#999"
+                />
+              </View>
+            )}
+            textInputProps={{
+              pointerEvents: "none",
+            }}
+          />
         </View>
       )}
 
@@ -253,11 +286,5 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     borderRadius: 8,
     marginTop: 12,
-    overflow: "hidden",
-  },
-  picker: {
-    height: 50,
-    width: "100%",
-    color: "#000",
   },
 });
