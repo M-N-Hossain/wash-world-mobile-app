@@ -7,6 +7,7 @@ export default function ProfileHeader() {
   const dispatch = useDispatch<AppDispatch>();
 
   const user = useSelector((state: RootState) => state.user.user_profile);
+  console.log("User profile in ProfileHeader:", user);
 
   return (
     <View style={styles.container}>
@@ -16,7 +17,7 @@ export default function ProfileHeader() {
       />
       <View>
         <Text style={styles.name}>{`${user.firstName} ${user.lastName}`}</Text>
-        <Text style={styles.status}>{`${user.membership} membership`}</Text>
+        <Text style={styles.status}>{`${user.subscription} membership`}</Text>
       </View>
     </View>
   );

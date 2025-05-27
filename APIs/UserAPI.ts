@@ -38,10 +38,9 @@ export class UserAPI {
   }
 
   static async getUserById(token: string) {
-    console.log("Fetching user with token:", token);
-    const decodedToken = jwtDecode(token) as DecodedToken;
-    console.log("Decoded token:", decodedToken);
+    
     try {
+      const decodedToken = jwtDecode(token) as DecodedToken;
       const response = await axios.get(`${this.API_URL}/api/users/${decodedToken.id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
