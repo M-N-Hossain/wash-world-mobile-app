@@ -1,24 +1,23 @@
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
-import React, { useEffect } from "react";
-import { House, MapPin, User } from "lucide-react-native";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "./store/store";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as SecureStore from "expo-secure-store";
-import { getUser, logout, reloadJwtFromStorage } from "./redux/userSlice";
+import { House, MapPin, User } from "lucide-react-native";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import LoadingScreen from "./components/LoadingScreen";
+import { getUser, logout, reloadJwtFromStorage } from "./redux/userSlice";
+import { AppDispatch, RootState } from "./store/store";
 
 ///////////////////// Screens /////////////////////
+import { jwtDecode } from "jwt-decode";
 import LoginScreen from "./screens/Auth/Login";
 import RegisterScreen from "./screens/Auth/Register";
-import OnboardingScreen from "./screens/Onboarding/OnboardingScreen";
-import MembershipOptionsScreen from "./screens/Profile/MembershipOptionsScreen";
-import ProfileScreen from "./screens/Profile/ProfileScreen";
+import History from "./screens/History";
 import HomePage from "./screens/HomePage";
 import Locations from "./screens/locations";
-import History from "./screens/History";
-import { jwtDecode } from "jwt-decode";
+import MembershipOptionsScreen from "./screens/Profile/MembershipOptionsScreen";
+import ProfileScreen from "./screens/Profile/ProfileScreen";
 
 // This is the type for the Profile stack
 export type ProfileStackParamList = {
@@ -180,34 +179,40 @@ export default function Navigation() {
     exp: number;
   };
 
-  // Initialize auth state from secure storage
-  useEffect(() => {
-    const initAuth = async () => {
-      try {
-        const stored = await SecureStore.getItemAsync("jwt");
-        console.log("Stored JWT:", stored);
+// Initialize auth state from secure storage
+useEffect(() => {
+  const initAuth = async () => {
+    try {
+      const stored = await SecureStore.getItemAsync("jwt");
+      console.log("Stored JWT:", stored);
 
-        if (stored && typeof stored === "string") {
-          const decoded: DecodedToken = jwtDecode(stored);
-          const now = Math.floor(Date.now() / 1000); // current time in seconds
+      if (stored && typeof stored === "string") {
+        const decoded: DecodedToken = jwtDecode(stored);
+        const now = Math.floor(Date.now() / 1000); // current time in seconds
 
-          if (decoded.exp < now) {
-            // Token has expired
-            dispatch(logout());
-          } else {
-            dispatch(reloadJwtFromStorage(stored));
-            setTimeout(() => {
-              dispatch(getUser(stored));
-            }, 100);
-          }
+        if (decoded.exp < now) {
+          // Token has expired - remove it from storage and logout
+          console.log("Token expired, logging out");
+          await SecureStore.deleteItemAsync("jwt");
+          dispatch(logout());
+        } else {
+          // Token is still valid
+          dispatch(reloadJwtFromStorage(stored));
+          setTimeout(() => {
+            dispatch(getUser(stored));
+          }, 100);
         }
-      } catch (err) {
-        console.error("Failed to initialize auth:", err);
       }
-    };
+    } catch (err) {
+      console.error("Failed to initialize auth:", err);
+      // If there's an error decoding the token, remove it and logout
+      await SecureStore.deleteItemAsync("jwt");
+      dispatch(logout());
+    }
+  };
 
-    initAuth();
-  }, []);
+  initAuth();
+}, []);
 
 
   return (
