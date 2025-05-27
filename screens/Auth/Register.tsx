@@ -121,7 +121,6 @@ export default function RegisterScreen() {
                 fontSize: 16,
                 paddingVertical: 12,
                 paddingHorizontal: 10,
-                borderWidth: 0,
                 color: "#000",
               },
               inputAndroid: {
@@ -133,8 +132,24 @@ export default function RegisterScreen() {
               placeholder: {
                 color: "#999",
               },
+              iconContainer: {
+                top: 16,
+                right: 12,
+              },
             }}
             useNativeAndroidPickerStyle={false}
+            Icon={() => (
+              <View style={{ top: 0, right: 2, position: "absolute" }}>
+                <ChevronLeft
+                  size={20}
+                  style={{ transform: [{ rotate: "270deg" }] }}
+                  color="#999"
+                />
+              </View>
+            )}
+            textInputProps={{
+              pointerEvents: "none",
+            }}
           />
         </View>
       )}
