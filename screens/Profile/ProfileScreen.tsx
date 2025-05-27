@@ -13,9 +13,10 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
 import { ProfileStackParamList } from "../../Navigation";
 import AlertMessage from "../../components/AlertMessage";
-import { useSelector } from "react-redux";
-import { RootState } from "../../store";
-import { UserAPI } from "../../api/UserAPI";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../store/store";
+import { UserAPI } from "../../APIs/UserAPI";
+import { updateUserProfile } from "../../redux/userSlice";
 
 export default function ProfileScreen() {
   type NavigationProp = NativeStackNavigationProp<
@@ -23,6 +24,8 @@ export default function ProfileScreen() {
     "ProfileScreen"
   >;
   const navigation = useNavigation<NavigationProp>();
+
+  const dispatch = useDispatch<AppDispatch>();
 
   const handleMembershipPress = () => {
     navigation.navigate("MembershipOptionsScreen");
@@ -37,18 +40,27 @@ export default function ProfileScreen() {
   const user = useSelector((state: RootState) => state.user.user_profile);
   const token = useSelector((state: RootState) => state.user.token);
 
-  // Local state initialized empty — will be set from Redux user data
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [licensePlate, setLicensePlate] = useState("");
+  /*   // Local state initialized empty — will be set from Redux user data
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const [email, setEmail] = useState("");
+    const [licensePlate, setLicensePlate] = useState(""); */
+
+  const [userData, setUserData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    licensePlate: "",
+  });
 
   // When Redux user changes, update local state
   useEffect(() => {
-    setFullName(user.firstName + " " + user.lastName);
-    setEmail(user.email);
-    setPhone(user.phone); // Not in Redux. Add setPhone(user.phone) in userSlice later
-    setLicensePlate(user.licensePlate);
+    setUserData({
+      firstName: user.firstName || "",
+      lastName: user.lastName || "",
+      email: user.email || "",
+      licensePlate: user.licensePlate || "",
+    });
   }, [user]);
 
   // Editing toggle
@@ -56,7 +68,7 @@ export default function ProfileScreen() {
 
   // Alert state
   const [showAlert, setShowAlert] = useState(false);
-  const [showError, setShowError] = useState(false); // 👈 error alert toggle
+  const [showError, setShowError] = useState(false);
 
   const showSuccessAlert = () => {
     setShowAlert(true);
@@ -70,30 +82,27 @@ export default function ProfileScreen() {
   const handleSave = async () => {
     setIsEditing(false);
 
-    // Prepare data to send to backend
-    const nameParts = fullName.trim().split(" ");
-    const firstName = nameParts[0];
-    const lastName = nameParts.slice(1).join(" "); // Handles middle names
-
-    const updatedUserData = {
-      firstName,
-      lastName,
-      email,
-      phone,
-      licensePlate,
+    const userToUpdateData = {
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      email: userData.email,
+      licensePlate: userData.licensePlate,
     };
 
     try {
       // We will add the api call to update user profile directly in the UserAPI file when we merge this branch into dev
       // Call backend update
-      const response = await UserAPI.updateUserProfile(token, updatedUserData);
+      const response = await UserAPI.updateUserProfile(token, userToUpdateData);
       console.log("Backend response:", response);
+      setUserData(response); // Update local state with response data
+      dispatch(updateUserProfile(response)); // Dispatch action to update Redux store
+      // Show success alert
       showSuccessAlert();
     } catch (error) {
       console.error("Failed to update user profile", error);
-      showErrorAlert(); 
+      showErrorAlert();
     }
-    // TODO: Do we need to update Redux with the new user?
+
   };
 
   return (
@@ -110,28 +119,28 @@ export default function ProfileScreen() {
             <>
               <TextInput
                 style={styles.input}
-                value={fullName}
-                onChangeText={setFullName}
-                placeholder="Full Name"
+                value={userData.firstName}
+                onChangeText={(text) => setUserData({ ...userData, firstName: text })}
+                placeholder="First Name"
               />
               <TextInput
                 style={styles.input}
-                value={email}
-                onChangeText={setEmail}
+                value={userData.lastName}
+                onChangeText={(text) => setUserData({ ...userData, lastName: text })}
+                placeholder="Last Name"
+              />
+              <TextInput
+                style={styles.input}
+                value={userData.email}
+                onChangeText={(text) => setUserData({ ...userData, email: text })}
                 placeholder="E-mail"
                 keyboardType="email-address"
               />
+
               <TextInput
                 style={styles.input}
-                value={phone}
-                onChangeText={setPhone}
-                placeholder="Phone number"
-                keyboardType="phone-pad"
-              />
-              <TextInput
-                style={styles.input}
-                value={licensePlate}
-                onChangeText={setLicensePlate}
+                value={userData.licensePlate}
+                onChangeText={(text) => setUserData({ ...userData, licensePlate: text })}
                 placeholder="License plate"
               />
               <TouchableOpacity onPress={handleSave}>
@@ -143,16 +152,17 @@ export default function ProfileScreen() {
           ) : (
             <>
               <View style={styles.innerBox}>
-                <Text>Full Name: {fullName}</Text>
+                <Text>First Name: {userData.firstName}</Text>
               </View>
               <View style={styles.innerBox}>
-                <Text>E-mail: {email}</Text>
+                <Text>Last Name: {userData.lastName}</Text>
               </View>
               <View style={styles.innerBox}>
-                <Text>Phone number: {phone}</Text>
+                <Text>E-mail: {userData.email}</Text>
               </View>
+
               <View style={styles.innerBox}>
-                <Text>License plate: {licensePlate}</Text>
+                <Text>License plate: {userData.licensePlate}</Text>
               </View>
               <TouchableOpacity onPress={() => setIsEditing(true)}>
                 <View style={styles.editButton}>
