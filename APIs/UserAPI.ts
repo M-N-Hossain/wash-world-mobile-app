@@ -1,7 +1,7 @@
-import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 import { CreateUserDto } from "../redux/CreateUserDto";
 import { LoginUserDto } from "../redux/LoginUserDto";
-import { jwtDecode } from "jwt-decode";
+import axiosInstance from "../utils/axiosInterceptor";
 
 import Constants from "expo-constants";
 
@@ -19,7 +19,7 @@ export class UserAPI {
 
   static async loginUser(userDto: LoginUserDto) {
     try {
-      const response = await axios.post(`${this.API_URL}/auth/login`, userDto);
+      const response = await axiosInstance.post(`${this.API_URL}/auth/login`, userDto);
       // console.log("Full response from backend:", response.data);
       return response.data;
     } catch (error) {
@@ -29,7 +29,7 @@ export class UserAPI {
   }
   static async signupUser(userDto: CreateUserDto) {
     try {
-      const response = await axios.post(`${this.API_URL}/auth/signup`, userDto);
+      const response = await axiosInstance.post(`${this.API_URL}/auth/signup`, userDto);
       return response.data;
     } catch (error) {
       console.error("Error signing up user:", error);
@@ -41,7 +41,7 @@ export class UserAPI {
     
     try {
       const decodedToken = jwtDecode(token) as DecodedToken;
-      const response = await axios.get(`${this.API_URL}/api/users/${decodedToken.id}`, {
+      const response = await axiosInstance.get(`${this.API_URL}/api/users/${decodedToken.id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -55,7 +55,7 @@ export class UserAPI {
   static async updateUserProfile(token: string, userData: any) {
     try {
       const decodedToken = jwtDecode(token) as DecodedToken;
-      const response = await axios.put(
+      const response = await axiosInstance.put(
         `${this.API_URL}/api/users/${decodedToken.id}`,
         userData,
         {

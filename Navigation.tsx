@@ -164,8 +164,6 @@ function BasicTabs() {
 }
 
 export default function Navigation() {
-
-
   const token = useSelector((state: RootState) => state.user.token);
   const isLoadingUser = useSelector(
     (state: RootState) => state.user.isLoadingUser
@@ -179,41 +177,64 @@ export default function Navigation() {
     exp: number;
   };
 
-// Initialize auth state from secure storage
-useEffect(() => {
-  const initAuth = async () => {
-    try {
-      const stored = await SecureStore.getItemAsync("jwt");
-      console.log("Stored JWT:", stored);
+  // Check for token expiration on app load and setup periodic checks
+  useEffect(() => {
+    const checkTokenExpiration = async () => {
+      try {
+        const stored = await SecureStore.getItemAsync("jwt");
+        
+        if (!stored) {
+          dispatch(logout());
+          return;
+        }
+        
+        try {
+          const decoded: DecodedToken = jwtDecode(stored);
+          const now = Math.floor(Date.now() / 1000); // current time in seconds
+          const timeUntilExpiry = decoded.exp - now;
 
-      if (stored && typeof stored === "string") {
-        const decoded: DecodedToken = jwtDecode(stored);
-        const now = Math.floor(Date.now() / 1000); // current time in seconds
-
-        if (decoded.exp < now) {
-          // Token has expired - remove it from storage and logout
-          console.log("Token expired, logging out");
+          // If token is expired, log out immediately
+          if (timeUntilExpiry <= 0) {
+            console.log("Token expired, logging out");
+            await SecureStore.deleteItemAsync("jwt");
+            dispatch(logout());
+            return;
+          }
+          
+          // If token is valid but we don't have it in Redux, load it
+          if (!token && timeUntilExpiry > 0) {
+            dispatch(reloadJwtFromStorage(stored));
+            dispatch(getUser(stored));
+          }
+          
+          // Set a timer to check again just before expiry
+          // Add a 10-second buffer to ensure we logout before actual expiration
+          const timeoutDuration = Math.max((timeUntilExpiry - 10) * 1000, 0);
+          if (timeoutDuration > 0) {
+            const expiryTimer = setTimeout(() => {
+              console.log("Token expiration timer triggered");
+              dispatch(logout());
+            }, timeoutDuration);
+            
+            return () => clearTimeout(expiryTimer);
+          }
+        } catch (decodeError) {
+          console.error("Error decoding token:", decodeError);
           await SecureStore.deleteItemAsync("jwt");
           dispatch(logout());
-        } else {
-          // Token is still valid
-          dispatch(reloadJwtFromStorage(stored));
-          setTimeout(() => {
-            dispatch(getUser(stored));
-          }, 100);
         }
+      } catch (err) {
+        console.error("Error checking token:", err);
+        dispatch(logout());
       }
-    } catch (err) {
-      console.error("Failed to initialize auth:", err);
-      // If there's an error decoding the token, remove it and logout
-      await SecureStore.deleteItemAsync("jwt");
-      dispatch(logout());
-    }
-  };
+    };
 
-  initAuth();
-}, []);
-
+    checkTokenExpiration();
+    
+    // Also set up a periodic check every minute as a safety measure
+    const intervalId = setInterval(checkTokenExpiration, 60000);
+    return () => clearInterval(intervalId);
+  }, [dispatch, token]);
 
   return (
     <NavigationContainer>
