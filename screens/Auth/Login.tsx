@@ -13,9 +13,9 @@ import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../store/store";
 import { LoginUserDto } from "../../redux/LoginUserDto";
 import { login } from "../../redux/userSlice";
+import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { AuthStackParamList } from "../../Navigation";
-import { useNavigation } from "@react-navigation/native";
 
 export default function LoginScreen() {
   const dispatch = useDispatch<AppDispatch>();
@@ -45,13 +45,6 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Back Button */}
-      <Pressable style={styles.backButton}>
-        <View style={styles.iconWrapper}>
-          <ChevronLeft size={24} />
-        </View>
-      </Pressable>
-
       {/* Title + Subtitle */}
       <Text style={styles.title}>Login to Wash World</Text>
       <Text style={styles.subtitle}>
@@ -98,8 +91,10 @@ export default function LoginScreen() {
       {/* Footer Links */}
       <View style={styles.footer}>
         <View style={styles.footerLeft}>
-          <Text>Already have an account?</Text>
-          <TouchableOpacity onPress={handleRegister}>
+          <Text>Don't have an account?</Text>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("RegisterScreen")}
+          >
             <Text style={styles.link}>Register instead</Text>
           </TouchableOpacity>
         </View>
