@@ -1,19 +1,19 @@
-import React, { use } from "react";
+import { Picker } from "@react-native-picker/picker";
+import { ChevronLeft, Lock, Mail } from "lucide-react-native";
+import React from "react";
 import {
-  View,
+  Pressable,
+  SafeAreaView,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
-  SafeAreaView,
-  Pressable,
+  View,
 } from "react-native";
-import { Mail, Lock, ChevronLeft } from "lucide-react-native";
 import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../store/store";
-import { signup } from "../../redux/userSlice";
-import { Picker } from "@react-native-picker/picker";
 import { useGetSubscriptions } from "../../hooks/useGetSubscriptions";
+import { signup } from "../../redux/userSlice";
+import { AppDispatch } from "../../store/store";
 
 export default function RegisterScreen() {
   const dispatch = useDispatch<AppDispatch>();
@@ -34,7 +34,7 @@ export default function RegisterScreen() {
         licensePlate,
         email,
         password,
-        subscriptionId
+        subscriptionId:  '26fa4dea-5f91-4131-ba98-87d36722f729'
       })
     );
     
