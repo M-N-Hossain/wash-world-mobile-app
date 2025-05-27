@@ -1,8 +1,8 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { CreateUserDto } from "./CreateUserDto";
-import { UserAPI } from "../APIs/UserAPI";
-import { LoginUserDto } from "./LoginUserDto";
 import * as SecureStore from "expo-secure-store";
+import { UserAPI } from "../APIs/UserAPI";
+import { CreateUserDto } from "./CreateUserDto";
+import { LoginUserDto } from "./LoginUserDto";
 
 export const signup = createAsyncThunk(
   "auth/signup",
@@ -10,9 +10,9 @@ export const signup = createAsyncThunk(
     const response = await UserAPI.signupUser(createUserDto);
     const token = response.access_token;
 
-    // Save the token securely immediately
+    // Save the token securely immediately - store as plain string
     await SecureStore.deleteItemAsync("jwt");
-    await SecureStore.setItemAsync("jwt", JSON.stringify(token));
+    await SecureStore.setItemAsync("jwt", token);
 
     await thunkApi.dispatch(getUser(token));
 
@@ -26,9 +26,9 @@ export const login = createAsyncThunk(
     const response = await UserAPI.loginUser(loginUserDto);
     const token = response.access_token;
 
-    // Save the token securely immediately
+    // Save the token securely immediately - store as plain string
     await SecureStore.deleteItemAsync("jwt");
-    await SecureStore.setItemAsync("jwt", JSON.stringify(token));
+    await SecureStore.setItemAsync("jwt", token);
 
     await thunkApi.dispatch(getUser(token));
 

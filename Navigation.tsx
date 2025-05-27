@@ -1,24 +1,23 @@
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
-import React, { useEffect } from "react";
-import { House, MapPin, User } from "lucide-react-native";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "./store/store";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as SecureStore from "expo-secure-store";
-import { getUser, logout, reloadJwtFromStorage } from "./redux/userSlice";
+import { House, MapPin, User } from "lucide-react-native";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import LoadingScreen from "./components/LoadingScreen";
+import { getUser, logout, reloadJwtFromStorage } from "./redux/userSlice";
+import { AppDispatch, RootState } from "./store/store";
 
 ///////////////////// Screens /////////////////////
+import { jwtDecode } from "jwt-decode";
 import LoginScreen from "./screens/Auth/Login";
 import RegisterScreen from "./screens/Auth/Register";
-import OnboardingScreen from "./screens/Onboarding/OnboardingScreen";
-import MembershipOptionsScreen from "./screens/Profile/MembershipOptionsScreen";
-import ProfileScreen from "./screens/Profile/ProfileScreen";
+import History from "./screens/History";
 import HomePage from "./screens/HomePage";
 import Locations from "./screens/locations";
-import History from "./screens/History";
-import { jwtDecode } from "jwt-decode";
+import MembershipOptionsScreen from "./screens/Profile/MembershipOptionsScreen";
+import ProfileScreen from "./screens/Profile/ProfileScreen";
 
 // This is the type for the Profile stack
 export type ProfileStackParamList = {
@@ -165,8 +164,6 @@ function BasicTabs() {
 }
 
 export default function Navigation() {
-
-
   const token = useSelector((state: RootState) => state.user.token);
   const isLoadingUser = useSelector(
     (state: RootState) => state.user.isLoadingUser
@@ -180,35 +177,50 @@ export default function Navigation() {
     exp: number;
   };
 
-  // Initialize auth state from secure storage
+  // Check for token expiration on app load
   useEffect(() => {
-    const initAuth = async () => {
+    const checkTokenExpiration = async () => {
       try {
         const stored = await SecureStore.getItemAsync("jwt");
-        console.log("Stored JWT:", stored);
-
-        if (stored && typeof stored === "string") {
+        
+        if (!stored) {
+          // No token found in storage
+          dispatch(logout());
+          return;
+        }
+        
+        try {
+          // Parse the token correctly - it's stored as a plain string
           const decoded: DecodedToken = jwtDecode(stored);
           const now = Math.floor(Date.now() / 1000); // current time in seconds
+          const timeUntilExpiry = decoded.exp - now;
 
-          if (decoded.exp < now) {
-            // Token has expired
+          // If token is expired, log out immediately
+          if (timeUntilExpiry <= 0) {
+            console.log("Token expired, logging out");
+            await SecureStore.deleteItemAsync("jwt");
             dispatch(logout());
-          } else {
-            dispatch(reloadJwtFromStorage(stored));
-            setTimeout(() => {
-              dispatch(getUser(stored));
-            }, 100);
+            return;
           }
+          
+          // If token is valid but we don't have it in Redux, load it
+          if (!token && timeUntilExpiry > 0) {
+            dispatch(reloadJwtFromStorage(stored));
+            dispatch(getUser(stored));
+          }
+        } catch (decodeError) {
+          console.error("Error decoding token:", decodeError);
+          await SecureStore.deleteItemAsync("jwt");
+          dispatch(logout());
         }
       } catch (err) {
-        console.error("Failed to initialize auth:", err);
+        console.error("Error checking token:", err);
+        dispatch(logout());
       }
     };
 
-    initAuth();
-  }, []);
-
+    checkTokenExpiration();
+  }, [dispatch]);
 
   return (
     <NavigationContainer>

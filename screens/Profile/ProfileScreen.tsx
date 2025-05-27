@@ -1,22 +1,23 @@
-import React, { useState, useEffect } from "react";
-import {
-  ScrollView,
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  TextInput,
-} from "react-native";
-import ProfileHeader from "../../components/ProfileHeader";
-import ProfileSection from "../../components/ProfileSection";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import React, { useEffect, useState } from "react";
+import {
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
+} from "react-native";
+import { useDispatch, useSelector } from "react-redux";
+import { UserAPI } from "../../APIs/UserAPI";
 import { ProfileStackParamList } from "../../Navigation";
 import AlertMessage from "../../components/AlertMessage";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../store/store";
-import { UserAPI } from "../../APIs/UserAPI";
+import ProfileHeader from "../../components/ProfileHeader";
+import ProfileSection from "../../components/ProfileSection";
+import { useTokenExpiration } from "../../hooks/useTokenExpiration";
 import { updateUserProfile } from "../../redux/userSlice";
+import { AppDispatch, RootState } from "../../store/store";
 
 export default function ProfileScreen() {
   type NavigationProp = NativeStackNavigationProp<
@@ -24,11 +25,23 @@ export default function ProfileScreen() {
     "ProfileScreen"
   >;
   const navigation = useNavigation<NavigationProp>();
+  const { checkTokenBeforeAction, handleExpiredToken } = useTokenExpiration();
 
   const dispatch = useDispatch<AppDispatch>();
 
+  // Check token on component mount
+  useEffect(() => {
+    const validateToken = async () => {
+      await handleExpiredToken();
+    };
+
+    validateToken();
+  }, []);
+
   const handleMembershipPress = () => {
-    navigation.navigate("MembershipOptionsScreen");
+    checkTokenBeforeAction(() => {
+      navigation.navigate("MembershipOptionsScreen");
+    });
   };
 
   const [openSection, setOpenSection] = useState<string | null>(null);
@@ -80,29 +93,30 @@ export default function ProfileScreen() {
 
   // Function to handle saving user details
   const handleSave = async () => {
-    setIsEditing(false);
+    checkTokenBeforeAction(async () => {
+      setIsEditing(false);
 
-    const userToUpdateData = {
-      firstName: userData.firstName,
-      lastName: userData.lastName,
-      email: userData.email,
-      licensePlate: userData.licensePlate,
-    };
+      const userToUpdateData = {
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        email: userData.email,
+        licensePlate: userData.licensePlate,
+      };
 
-    try {
-      // We will add the api call to update user profile directly in the UserAPI file when we merge this branch into dev
-      // Call backend update
-      const response = await UserAPI.updateUserProfile(token, userToUpdateData);
-      console.log("Backend response:", response);
-      setUserData(response); // Update local state with response data
-      dispatch(updateUserProfile(response)); // Dispatch action to update Redux store
-      // Show success alert
-      showSuccessAlert();
-    } catch (error) {
-      console.error("Failed to update user profile", error);
-      showErrorAlert();
-    }
-
+      try {
+        // We will add the api call to update user profile directly in the UserAPI file when we merge this branch into dev
+        // Call backend update
+        const response = await UserAPI.updateUserProfile(token, userToUpdateData);
+        console.log("Backend response:", response);
+        setUserData(response); // Update local state with response data
+        dispatch(updateUserProfile(response)); // Dispatch action to update Redux store
+        // Show success alert
+        showSuccessAlert();
+      } catch (error) {
+        console.error("Failed to update user profile", error);
+        showErrorAlert();
+      }
+    });
   };
 
   return (
