@@ -26,14 +26,14 @@ export default function History() {
         {data &&
           data.map(
             (wash: {
-              wash_id: React.Key;
-              wash_location: string;
-              wash_date: string;
+              id: React.Key;
+              washLocation: string;
+              washDatetime: string;
             }) => (
               <WashCard
-                key={wash.wash_id}
-                name={wash.wash_location}
-                date={formatDate(wash.wash_date)}
+                key={wash.id}
+                name={wash.washLocation}
+                date={formatDate(wash.washDatetime)}
               />
             )
           )}

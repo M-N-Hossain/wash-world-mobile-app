@@ -20,13 +20,13 @@ export const useGetWashes = (id: number) => {
     const isExpired = await handleExpiredToken();
     if (isExpired) throw new Error("Token expired");
 
-    const response = await axiosInstance.get(`${API_URL}/wash/${id}`, {
+    const response = await axiosInstance.get(`${API_URL}/api/washes/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
     });
-    // console.log(`Fetched washes for user ID ${id}`, response.data);
+    console.log(`Fetched washes for user ID ${id}`, response.data);
 
     return response.data;
   };
