@@ -13,7 +13,7 @@ export const useRegisterWash = () => {
 
   return useMutation({
     mutationFn: async (wash: WashEntity) => {
-      const response = await axios.post(`${API_URL}/wash`, wash, {
+      const response = await axios.post(`${API_URL}/api/washes`, wash, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",

@@ -28,8 +28,18 @@ export default function MapCalloutExtended({
   // Function to handle registering a wash
   const handleBeginWash = () => {
     const wash_location = name;
-    const user_id = user.id;
-    const washEntity: WashEntity = new WashEntity(wash_location, user_id);
+    const fk_user_id = user.id;
+    const fk_feedback_id = undefined;
+    const reward = false;
+    const fk_reward_id = undefined;
+
+    const washEntity: WashEntity = new WashEntity(
+      wash_location,
+      fk_user_id,
+      fk_feedback_id,
+      reward,
+      fk_reward_id
+    );
 
     registerWash(washEntity, {
       onSuccess: () => {
@@ -63,6 +73,5 @@ const styles = StyleSheet.create({
     // backgroundColor: "#FFFFFF",
     width: "100%",
     height: "100%",
-  }
-
-})
+  },
+});
