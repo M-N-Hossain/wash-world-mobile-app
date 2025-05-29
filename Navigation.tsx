@@ -18,6 +18,7 @@ import HomePage from "./screens/HomePage";
 import Locations from "./screens/locations";
 import MembershipOptionsScreen from "./screens/Profile/MembershipOptionsScreen";
 import ProfileScreen from "./screens/Profile/ProfileScreen";
+import FeedbackScreen from "./screens/Feedback";
 
 // This is the type for the Profile stack
 export type ProfileStackParamList = {
@@ -34,7 +35,7 @@ export type HomepageStackParamList = {
 
 export type WashHistoryStackParamList = {
   History: undefined;
-  Feedback: undefined;
+  FeedbackScreen: { washLocation: string; washId: unknown };
 };
 
 // This is the type for the Auth stack
@@ -124,6 +125,26 @@ function HomepageStack() {
     <HomepageStackNavigator.Navigator screenOptions={{ headerShown: false }}>
       <HomepageStackNavigator.Screen name="Homepage" component={HomePage} />
       <HomepageStackNavigator.Screen name="Locations" component={Locations} />
+      <HomepageStackNavigator.Screen
+        name="FeedbackScreen"
+        component={FeedbackScreen}
+        options={{
+          title: "Feedback",
+          headerShown: true,
+          headerStyle: { backgroundColor: "#0ac267" },
+          headerTintColor: "#fff",
+        }}
+      />
+      <HomepageStackNavigator.Screen
+        name="History"
+        component={History}
+        options={{
+          title: "Wash History",
+          headerShown: true,
+          headerStyle: { backgroundColor: "#0ac267" },
+          headerTintColor: "#fff",
+        }}
+      />
     </HomepageStackNavigator.Navigator>
   );
 }
@@ -203,13 +224,13 @@ export default function Navigation() {
     const checkTokenExpiration = async () => {
       try {
         const stored = await SecureStore.getItemAsync("jwt");
-        
+
         if (!stored) {
           // No token found in storage
           dispatch(logout());
           return;
         }
-        
+
         try {
           // Parse the token correctly - it's stored as a plain string
           const decoded: DecodedToken = jwtDecode(stored);
@@ -223,7 +244,7 @@ export default function Navigation() {
             dispatch(logout());
             return;
           }
-          
+
           // If token is valid but we don't have it in Redux, load it
           if (!token && timeUntilExpiry > 0) {
             dispatch(reloadJwtFromStorage(stored));

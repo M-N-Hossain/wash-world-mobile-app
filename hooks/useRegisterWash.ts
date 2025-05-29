@@ -2,9 +2,9 @@ import { useMutation } from "@tanstack/react-query";
 import { WashEntity } from "../entities/RegisterWash";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
-import axios from "axios";
 
 import Constants from "expo-constants";
+import axiosInstance from "../utils/axiosInterceptor";
 
 const API_URL = Constants.expoConfig?.extra?.API_URL;
 
@@ -13,7 +13,7 @@ export const useRegisterWash = () => {
 
   return useMutation({
     mutationFn: async (wash: WashEntity) => {
-      const response = await axios.post(`${API_URL}/api/washes`, wash, {
+      const response = await axiosInstance.post(`${API_URL}/api/washes`, wash, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
