@@ -30,10 +30,6 @@ export type ProfileStackParamList = {
 export type HomepageStackParamList = {
   Homepage: undefined;
   Locations: undefined;
-  WashHistoryStack: { screen: string };
-};
-
-export type WashHistoryStackParamList = {
   History: undefined;
   FeedbackScreen: { washLocation: string; washId: unknown };
 };
@@ -100,19 +96,6 @@ function ProfileStack() {
         }}
       />
     </ProfileStackNavigator.Navigator>
-  );
-}
-
-// Wash history stack
-const FeedbackStackNavigator =
-  createNativeStackNavigator<WashHistoryStackParamList>();
-
-function WashHistoryStack() {
-  return (
-    <FeedbackStackNavigator.Navigator>
-      <FeedbackStackNavigator.Screen name="History" component={History} />
-      <FeedbackStackNavigator.Screen name="Feedback" component={Feedback} />
-    </FeedbackStackNavigator.Navigator>
   );
 }
 
@@ -200,7 +183,7 @@ function RootStackNavigator() {
       {/* Main tabs */}
       <RootStack.Screen name="MainTabs" component={BasicTabs} />
       {/* Stack for history + feedback, outside of tabs */}
-      <RootStack.Screen name="WashHistoryStack" component={WashHistoryStack} />
+      <RootStack.Screen name="WashHistoryStack" component={History} />
     </RootStack.Navigator>
   );
 }
@@ -266,7 +249,15 @@ export default function Navigation() {
 
   return (
     <NavigationContainer>
-      <RootStackNavigator />
+      {token ? (
+        isLoadingUser || user_profile.id === 0 ? (
+          <LoadingScreen />
+        ) : (
+          <BasicTabs />
+        )
+      ) : (
+        <AuthStack />
+      )}
     </NavigationContainer>
   );
 }
