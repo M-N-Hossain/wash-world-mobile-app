@@ -1,12 +1,10 @@
-import { View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import ExtendedTop from "./ExtendedTop";
 import ExtendedBottom from "./ExtendedBottom";
 import { useRegisterWash } from "../../hooks/useRegisterWash";
 import { WashEntity } from "../../entities/RegisterWash";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
-import { UserAPI } from "../../APIs/UserAPI";
-import { useEffect, useState } from "react";
 
 type MapCalloutExtendedProps = {
   name: string;
@@ -28,8 +26,18 @@ export default function MapCalloutExtended({
   // Function to handle registering a wash
   const handleBeginWash = () => {
     const wash_location = name;
-    const user_id = user.id;
-    const washEntity: WashEntity = new WashEntity(wash_location, user_id);
+    const fk_user_id = user.id;
+    const reward = false;
+    const points_gained = 50;
+    const fk_reward_id = undefined;
+
+    const washEntity: WashEntity = new WashEntity(
+      wash_location,
+      fk_user_id,
+      reward,
+      points_gained,
+      fk_reward_id
+    );
 
     registerWash(washEntity, {
       onSuccess: () => {
@@ -42,7 +50,7 @@ export default function MapCalloutExtended({
   };
 
   return (
-    <View>
+    <View style={styles.container}>
       <ExtendedTop
         address={address}
         name={name}
@@ -55,3 +63,13 @@ export default function MapCalloutExtended({
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    justifyContent: "space-between",
+    alignItems: "center",
+    // backgroundColor: "#FFFFFF",
+    width: "100%",
+    height: "100%",
+  },
+});

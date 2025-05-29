@@ -1,8 +1,8 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { CreateUserDto } from "./CreateUserDto";
-import { UserAPI } from "../APIs/UserAPI";
-import { LoginUserDto } from "./LoginUserDto";
 import * as SecureStore from "expo-secure-store";
+import { UserAPI } from "../APIs/UserAPI";
+import { CreateUserDto } from "./CreateUserDto";
+import { LoginUserDto } from "./LoginUserDto";
 
 export const signup = createAsyncThunk(
   "auth/signup",
@@ -10,9 +10,9 @@ export const signup = createAsyncThunk(
     const response = await UserAPI.signupUser(createUserDto);
     const token = response.access_token;
 
-    // Save the token securely immediately
+    // Save the token securely immediately - store as plain string
     await SecureStore.deleteItemAsync("jwt");
-    await SecureStore.setItemAsync("jwt", JSON.stringify(token));
+    await SecureStore.setItemAsync("jwt", token);
 
     await thunkApi.dispatch(getUser(token));
 
@@ -26,9 +26,9 @@ export const login = createAsyncThunk(
     const response = await UserAPI.loginUser(loginUserDto);
     const token = response.access_token;
 
-    // Save the token securely immediately
+    // Save the token securely immediately - store as plain string
     await SecureStore.deleteItemAsync("jwt");
-    await SecureStore.setItemAsync("jwt", JSON.stringify(token));
+    await SecureStore.setItemAsync("jwt", token);
 
     await thunkApi.dispatch(getUser(token));
 
@@ -40,14 +40,8 @@ export const getUser = createAsyncThunk(
   "auth/getUser",
   async (token: string, thunkApi) => {
     const response = await UserAPI.getUserById(token);
-    return {
-      id: response.id,
-      firstName: response.firstName,
-      lastName: response.lastName,
-      licensePlate: response.licensePlate,
-      email: response.email,
-      membership: response.membership,
-    };
+    console.log("User profile fetched:", response);
+    return response
   }
 );
 
@@ -61,7 +55,7 @@ type UserState = {
     lastName: string;
     licensePlate: string;
     email: string;
-    membership: string;
+    subscription: string;
   };
 };
 
@@ -75,7 +69,7 @@ const initialState: UserState = {
     lastName: "",
     licensePlate: "",
     email: "",
-    membership: "",
+    subscription: "",
   },
 };
 
@@ -92,7 +86,7 @@ const userSlice = createSlice({
         lastName: "",
         licensePlate: "",
         email: "",
-        membership: "",
+        subscription: "",
       };
     },
     logout: (state) => {
@@ -104,12 +98,18 @@ const userSlice = createSlice({
         lastName: "",
         licensePlate: "",
         email: "",
-        membership: "",
+        subscription: "",
       };
 
       // Remove token from secure storage
       SecureStore.deleteItemAsync("jwt");
     },
+    updateUserProfile: (state, action) => {
+      state.user_profile = {
+        ...state.user_profile, 
+        ...action.payload
+      };
+    }
   },
   extraReducers: (builder) => {
     builder.addCase(login.fulfilled, (state, action) => {
@@ -137,7 +137,7 @@ const userSlice = createSlice({
         lastName: action.payload.lastName,
         licensePlate: action.payload.licensePlate,
         email: action.payload.email,
-        membership: action.payload.membership,
+        subscription: action.payload.subscription.tierName,
       };
       state.errormessage = "";
     });
@@ -153,12 +153,12 @@ const userSlice = createSlice({
         lastName: "",
         licensePlate: "",
         email: "",
-        membership: "",
+        subscription: "",
       };
       state.errormessage = "Failed to fetch user profile. Please try again.";
     });
   },
 });
 
-export const { reloadJwtFromStorage, logout } = userSlice.actions;
+export const { reloadJwtFromStorage, logout, updateUserProfile } = userSlice.actions;
 export default userSlice.reducer;

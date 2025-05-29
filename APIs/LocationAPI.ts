@@ -1,4 +1,4 @@
-import axios from "axios";
+import axiosInstance from "../utils/axiosInterceptor";
 
 export class LocationAPI {
   static LOCATION_URL =
@@ -6,7 +6,7 @@ export class LocationAPI {
 
   static async getLocations() {
     try {
-      const response = await axios.get(LocationAPI.LOCATION_URL);
+      const response = await axiosInstance.get(LocationAPI.LOCATION_URL);
       return response.data;
     } catch (error) {
       console.error("Error fetching locations:", error);

@@ -1,21 +1,22 @@
-import React from "react";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { ArrowUpRight, MessageCircleHeart } from "lucide-react-native";
+import React, { useEffect } from "react";
 import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
+import { useSelector } from "react-redux";
 import Header from "../components/Header";
+import LiveStatusCard from "../components/LiveStatusCard";
 import LocationCard from "../components/NearbyWashCard";
 import WashCard from "../components/WashHistoryCard";
-import { ArrowUpRight, MessageCircleHeart } from "lucide-react-native";
-import LiveStatusCard from "../components/LiveStatusCard";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { HomepageStackParamList } from "../Navigation";
-import { useNavigation } from "@react-navigation/native";
 import { useGetWashes } from "../hooks/useGetWashes";
-import { useSelector } from "react-redux";
+import { useTokenExpiration } from "../hooks/useTokenExpiration";
+import { HomepageStackParamList } from "../Navigation";
 import { RootState } from "../store/store";
 import { formatDate } from "../utils/formatDate";
 
@@ -26,21 +27,33 @@ export default function HomePage() {
   >;
 
   const navigation = useNavigation<NavigationProp>();
+  const { checkTokenBeforeAction } = useTokenExpiration();
 
   const handleLocationPress = () => {
-    // console.log("See all locations pressed");
-    navigation.navigate("Locations");
+    checkTokenBeforeAction(() => {
+      navigation.navigate("Locations");
+    });
   };
 
   const handleHistoryPress = () => {
-    // console.log("See full history pressed");
-    navigation.navigate("WashHistoryStack", {
-      screen: "History",
+    checkTokenBeforeAction(() => {
+      navigation.navigate("History");
     });
   };
 
   const user = useSelector((state: RootState) => state.user.user_profile);
   const { isLoading, error, data } = useGetWashes(user.id);
+
+  // Check token on component mount
+  useEffect(() => {
+    const validateToken = async () => {
+      await checkTokenBeforeAction(() => {
+        console.log("Token is valid on HomePage mount");
+      });
+    };
+
+    validateToken();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -86,14 +99,14 @@ export default function HomePage() {
             .slice(0, 2)
             .map(
               (wash: {
-                wash_id: React.Key;
-                wash_location: string;
-                wash_date: string;
+                id: React.Key;
+                washLocation: string;
+                washDatetime: string;
               }) => (
                 <WashCard
-                  key={wash.wash_id}
-                  name={wash.wash_location}
-                  date={formatDate(wash.wash_date)}
+                  key={wash.id}
+                  name={wash.washLocation}
+                  date={formatDate(wash.washDatetime)}
                 />
               )
             )}

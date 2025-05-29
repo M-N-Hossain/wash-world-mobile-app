@@ -1,11 +1,19 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { StyleSheet } from "react-native";
-import Navigation from "./Navigation";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Provider } from "react-redux";
+import Navigation from "./Navigation";
+import { logout } from "./redux/userSlice";
 import { store } from "./store/store";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { setupLogoutHandler } from "./utils/axiosInterceptor";
 
 const queryClient = new QueryClient();
+
+// Set up the logout handler with the store's dispatch
+// This breaks the circular dependency by calling setupLogoutHandler after store is created
+setupLogoutHandler(() => {
+  store.dispatch(logout());
+});
 
 export default function App() {
   return (

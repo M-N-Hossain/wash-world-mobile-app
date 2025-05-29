@@ -1,24 +1,23 @@
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
-import React, { useEffect } from "react";
-import { House, MapPin, User } from "lucide-react-native";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "./store/store";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as SecureStore from "expo-secure-store";
-import { getUser, reloadJwtFromStorage } from "./redux/userSlice";
+import { House, MapPin, User } from "lucide-react-native";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import LoadingScreen from "./components/LoadingScreen";
+import { getUser, logout, reloadJwtFromStorage } from "./redux/userSlice";
+import { AppDispatch, RootState } from "./store/store";
 
 ///////////////////// Screens /////////////////////
+import { jwtDecode } from "jwt-decode";
 import LoginScreen from "./screens/Auth/Login";
 import RegisterScreen from "./screens/Auth/Register";
-import OnboardingScreen from "./screens/Onboarding/OnboardingScreen";
-import MembershipOptionsScreen from "./screens/Profile/MembershipOptionsScreen";
-import ProfileScreen from "./screens/Profile/ProfileScreen";
+import History from "./screens/History";
 import HomePage from "./screens/HomePage";
 import Locations from "./screens/locations";
-import History from "./screens/History";
-import Feedback from "./screens/Feedback";
+import MembershipOptionsScreen from "./screens/Profile/MembershipOptionsScreen";
+import ProfileScreen from "./screens/Profile/ProfileScreen";
 
 // This is the type for the Profile stack
 export type ProfileStackParamList = {
@@ -195,39 +194,54 @@ export default function Navigation() {
   );
 
   const dispatch = useDispatch<AppDispatch>();
+  type DecodedToken = {
+    exp: number;
+  };
 
-  // Initialize auth state from secure storage
+  // Check for token expiration on app load
   useEffect(() => {
-    const initAuth = async () => {
+    const checkTokenExpiration = async () => {
       try {
         const stored = await SecureStore.getItemAsync("jwt");
-        if (stored) {
-          const parsedToken = JSON.parse(stored);
-          if (parsedToken && typeof parsedToken === "string") {
-            dispatch(reloadJwtFromStorage(parsedToken));
-            setTimeout(() => {
-              dispatch(getUser(parsedToken));
-            }, 100);
+        
+        if (!stored) {
+          // No token found in storage
+          dispatch(logout());
+          return;
+        }
+        
+        try {
+          // Parse the token correctly - it's stored as a plain string
+          const decoded: DecodedToken = jwtDecode(stored);
+          const now = Math.floor(Date.now() / 1000); // current time in seconds
+          const timeUntilExpiry = decoded.exp - now;
+
+          // If token is expired, log out immediately
+          if (timeUntilExpiry <= 0) {
+            console.log("Token expired, logging out");
+            await SecureStore.deleteItemAsync("jwt");
+            dispatch(logout());
+            return;
           }
+          
+          // If token is valid but we don't have it in Redux, load it
+          if (!token && timeUntilExpiry > 0) {
+            dispatch(reloadJwtFromStorage(stored));
+            dispatch(getUser(stored));
+          }
+        } catch (decodeError) {
+          console.error("Error decoding token:", decodeError);
+          await SecureStore.deleteItemAsync("jwt");
+          dispatch(logout());
         }
       } catch (err) {
-        console.error("Failed to initialize auth:", err);
+        console.error("Error checking token:", err);
+        dispatch(logout());
       }
     };
-    initAuth();
-  }, []);
 
-  if (!token) {
-    return (
-      <NavigationContainer>
-        <AuthStack />
-      </NavigationContainer>
-    );
-  }
-
-  if (isLoadingUser || user_profile.id === 0) {
-    return <LoadingScreen />;
-  }
+    checkTokenExpiration();
+  }, [dispatch]);
 
   return (
     <NavigationContainer>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { use } from "react";
 import {
   View,
   Text,
@@ -12,16 +12,26 @@ import { Mail, Lock, ChevronLeft } from "lucide-react-native";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../store/store";
 import { signup } from "../../redux/userSlice";
+import RNPickerSelect from "react-native-picker-select";
+import { useGetSubscriptions } from "../../hooks/useGetSubscriptions";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { AuthStackParamList } from "../../Navigation";
 
 export default function RegisterScreen() {
   const dispatch = useDispatch<AppDispatch>();
+  type NavigationProp = NativeStackNavigationProp<
+    AuthStackParamList,
+    "RegisterScreen"
+  >;
+  const navigation = useNavigation<NavigationProp>();
 
   const [firstName, setFirstName] = React.useState("");
   const [lastName, setLastName] = React.useState("");
   const [licensePlate, setLicensePlate] = React.useState("");
-  const [membership, setMembership] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [subscriptionId, setSubscriptionId] = React.useState("");
 
   // Handle register action
   const handleRegister = () => {
@@ -30,22 +40,19 @@ export default function RegisterScreen() {
         firstName,
         lastName,
         licensePlate,
-        membership,
         email,
         password,
+        subscriptionId,
+
       })
     );
   };
 
+  const { isLoading, isError, data, error } = useGetSubscriptions();
+  console.log("Subscriptions data:", data);
+
   return (
     <SafeAreaView style={styles.container}>
-      {/* Back Button */}
-      <Pressable style={styles.backButton}>
-        <View style={styles.iconWrapper}>
-          <ChevronLeft size={24} />
-        </View>
-      </Pressable>
-
       {/* Title + Subtitle */}
       <Text style={styles.title}>Welcome to Wash World</Text>
       <Text style={styles.subtitle}>
@@ -62,9 +69,6 @@ export default function RegisterScreen() {
           value={firstName}
           onChangeText={setFirstName}
         />
-        <View style={styles.iconWrapper}>
-          <Mail size={20} />
-        </View>
       </View>
 
       {/* LastName Input */}
@@ -77,9 +81,6 @@ export default function RegisterScreen() {
           value={lastName}
           onChangeText={setLastName}
         />
-        <View style={styles.iconWrapper}>
-          <Mail size={20} />
-        </View>
       </View>
 
       {/* LicensePlate Input */}
@@ -92,25 +93,59 @@ export default function RegisterScreen() {
           value={licensePlate}
           onChangeText={setLicensePlate}
         />
-        <View style={styles.iconWrapper}>
-          <Mail size={20} />
-        </View>
       </View>
 
       {/* Membership Input */}
-      <View style={styles.inputContainer}>
-        <TextInput
-          placeholder="brillant, premium or gold"
-          style={styles.textInput}
-          placeholderTextColor="#999"
-          keyboardType="default"
-          value={membership}
-          onChangeText={setMembership}
-        />
-        <View style={styles.iconWrapper}>
-          <Mail size={20} />
+      {isLoading ? (
+        <Text>Loading memberships...</Text>
+      ) : error ? (
+        <Text>Error loading memberships</Text>
+      ) : (
+        <View style={styles.pickerContainer}>
+          <RNPickerSelect
+            onValueChange={setSubscriptionId}
+            value={subscriptionId}
+            placeholder={{ label: "Select membership", value: "" }}
+            items={
+              data?.map((sub) => ({ label: sub.tierName, value: sub.id })) || []
+            }
+            style={{
+              inputIOS: {
+                fontSize: 16,
+                paddingVertical: 12,
+                paddingHorizontal: 10,
+                color: "#000",
+              },
+              inputAndroid: {
+                fontSize: 16,
+                paddingHorizontal: 10,
+                paddingVertical: 8,
+                color: "#000",
+              },
+              placeholder: {
+                color: "#999",
+              },
+              iconContainer: {
+                top: 16,
+                right: 12,
+              },
+            }}
+            useNativeAndroidPickerStyle={false}
+            Icon={() => (
+              <View style={{ top: 0, right: 2, position: "absolute" }}>
+                <ChevronLeft
+                  size={20}
+                  style={{ transform: [{ rotate: "270deg" }] }}
+                  color="#999"
+                />
+              </View>
+            )}
+            textInputProps={{
+              pointerEvents: "none",
+            }}
+          />
         </View>
-      </View>
+      )}
 
       {/* Email Input */}
       <View style={styles.inputContainer}>
@@ -167,7 +202,12 @@ export default function RegisterScreen() {
       <View style={styles.footer}>
         <Text style={styles.footerText}>
           Already have an account?{" "}
-          <Text style={styles.link}>Login instead</Text>
+          <Text
+            style={styles.link}
+            onPress={() => navigation.navigate("LoginScreen")}
+          >
+            Login instead
+          </Text>
         </Text>
       </View>
     </SafeAreaView>
@@ -240,5 +280,11 @@ const styles = StyleSheet.create({
   link: {
     color: "#0AC267",
     fontWeight: "bold",
+  },
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    marginTop: 12,
   },
 });
