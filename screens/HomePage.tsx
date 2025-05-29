@@ -3,22 +3,23 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ArrowUpRight, MessageCircleHeart } from "lucide-react-native";
 import React, { useEffect } from "react";
 import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { useSelector } from "react-redux";
 import Header from "../components/Header";
 import LiveStatusCard from "../components/LiveStatusCard";
-import LocationCard from "../components/NearbyWashCard";
 import WashCard from "../components/WashHistoryCard";
 import { useGetWashes } from "../hooks/useGetWashes";
 import { useTokenExpiration } from "../hooks/useTokenExpiration";
 import { HomepageStackParamList } from "../Navigation";
 import { RootState } from "../store/store";
 import { formatDate } from "../utils/formatDate";
+import FeedbackReportCard from "../components/FeedbackReportCard";
+import { useGetFeedbackReports } from "../hooks/useGetFeedbackReports";
 
 export default function HomePage() {
   type NavigationProp = NativeStackNavigationProp<
@@ -29,9 +30,10 @@ export default function HomePage() {
   const navigation = useNavigation<NavigationProp>();
   const { checkTokenBeforeAction } = useTokenExpiration();
 
-  const handleLocationPress = () => {
+  const handleFeedbackPress = () => {
+    // console.log("See all feedback reports");
     checkTokenBeforeAction(() => {
-      navigation.navigate("Locations");
+      navigation.navigate("FeedbackReportsScreen");
     });
   };
 
@@ -42,7 +44,16 @@ export default function HomePage() {
   };
 
   const user = useSelector((state: RootState) => state.user.user_profile);
-  const { isLoading, error, data } = useGetWashes(user.id);
+  const {
+    isLoading: washesLoading,
+    error: washesError,
+    data: washesData,
+  } = useGetWashes(user.id);
+  const {
+    isLoading: feedbackLoading,
+    error: feedbackError,
+    data: feedbackData,
+  } = useGetFeedbackReports(user.id);
 
   // Check token on component mount
   useEffect(() => {
@@ -68,34 +79,14 @@ export default function HomePage() {
           timer="03:27"
         />
 
-        {/* Nearby Wash World */}
-        <Text style={styles.sectionTitle}>Nearby Wash World</Text>
-        <LocationCard
-          name="Wash World Aarhus"
-          address="Ringvej Syd 100, Aarhus"
-          distance="0,67km"
-        />
-        <LocationCard
-          name="Wash World Aarhus"
-          address="Ringvej Syd 100, Aarhus"
-          distance="0,67km"
-        />
-        <View style={styles.linkWrapper}>
-          <TouchableOpacity
-            style={styles.linkButton}
-            onPress={handleLocationPress}
-          >
-            <Text style={styles.linkText}>See all locations</Text>
-            <ArrowUpRight color="#777777" size={30} />
-          </TouchableOpacity>
-        </View>
-
         {/* Last Washes */}
         <Text style={styles.sectionTitle}>Last Washes</Text>
-        {isLoading && <Text>Loading...</Text>}
-        {error && <Text>Error fetching washes: {error.message}</Text>}
-        {data &&
-          data
+        {washesLoading && <Text>Loading...</Text>}
+        {washesError && (
+          <Text>Error fetching washes: {washesError.message}</Text>
+        )}
+        {washesData &&
+          washesData
             .slice(0, 2)
             .map(
               (wash: {
@@ -117,6 +108,38 @@ export default function HomePage() {
             onPress={handleHistoryPress}
           >
             <Text style={styles.linkText}>See full history</Text>
+            <ArrowUpRight color="#777777" size={30} />
+          </TouchableOpacity>
+        </View>
+
+        {/* Feedback reports */}
+        <Text style={styles.sectionTitle}>Your feedback reports</Text>
+        {feedbackLoading && <Text>Loading...</Text>}
+        {feedbackError && (
+          <Text>Error fetching feedback reports: {feedbackError.message}</Text>
+        )}
+        {feedbackData &&
+          feedbackData
+            .slice(0, 2)
+            .map(
+              (feedbackReport: {
+                id: React.Key;
+                rating: string;
+                title: string;
+              }) => (
+                <FeedbackReportCard
+                  key={feedbackReport.id}
+                  rating={feedbackReport.rating}
+                  title={feedbackReport.title}
+                />
+              )
+            )}
+        <View style={styles.linkWrapper}>
+          <TouchableOpacity
+            style={styles.linkButton}
+            onPress={handleFeedbackPress}
+          >
+            <Text style={styles.linkText}>See all reports</Text>
             <ArrowUpRight color="#777777" size={30} />
           </TouchableOpacity>
         </View>

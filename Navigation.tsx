@@ -19,6 +19,7 @@ import Locations from "./screens/locations";
 import MembershipOptionsScreen from "./screens/Profile/MembershipOptionsScreen";
 import ProfileScreen from "./screens/Profile/ProfileScreen";
 import FeedbackScreen from "./screens/Feedback";
+import FeedbackReportsScreen from "./screens/FeedbackReports";
 
 // This is the type for the Profile stack
 export type ProfileStackParamList = {
@@ -32,6 +33,7 @@ export type HomepageStackParamList = {
   Locations: undefined;
   History: undefined;
   FeedbackScreen: { washLocation: string; washId: unknown };
+  FeedbackReportsScreen: undefined
 };
 
 // This is the type for the Auth stack
@@ -119,6 +121,16 @@ function HomepageStack() {
         }}
       />
       <HomepageStackNavigator.Screen
+        name="FeedbackReportsScreen"
+        component={FeedbackReportsScreen}
+        options={{
+          title: "Feedback reports",
+          headerShown: true,
+          headerStyle: { backgroundColor: "#0ac267" },
+          headerTintColor: "#fff",
+        }}
+      />
+      <HomepageStackNavigator.Screen
         name="History"
         component={History}
         options={{
@@ -172,19 +184,6 @@ function BasicTabs() {
         }}
       />
     </Tab.Navigator>
-  );
-}
-
-const RootStack = createNativeStackNavigator();
-
-function RootStackNavigator() {
-  return (
-    <RootStack.Navigator screenOptions={{ headerShown: false }}>
-      {/* Main tabs */}
-      <RootStack.Screen name="MainTabs" component={BasicTabs} />
-      {/* Stack for history + feedback, outside of tabs */}
-      <RootStack.Screen name="WashHistoryStack" component={History} />
-    </RootStack.Navigator>
   );
 }
 
