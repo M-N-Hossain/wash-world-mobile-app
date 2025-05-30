@@ -1,4 +1,3 @@
-import { Picker } from "@react-native-picker/picker";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ChevronLeft, Lock, Mail } from "lucide-react-native";
@@ -12,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import RNPickerSelect from 'react-native-picker-select';
 import { useDispatch } from "react-redux";
 import { UserAPI } from "../../APIs/UserAPI";
 import { useGetSubscriptions } from "../../hooks/useGetSubscriptions";
@@ -313,11 +313,6 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     borderRadius: 8,
     marginTop: 12,
-  },
-  errorText: {
-    color: "red",
-    marginTop: 12,
-    textAlign: "center",
   },
   errorText: {
     color: "red",
