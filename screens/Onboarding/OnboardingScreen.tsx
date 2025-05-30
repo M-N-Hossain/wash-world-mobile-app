@@ -25,14 +25,11 @@ const OnboardingScreen = () => {
   // Auto navigate to home after 30 seconds
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "LoginScreen" }],
-      });
+      goToHomeScreen();
     }, 30000); // 30 seconds
 
     return () => clearTimeout(timer);
-  }, [navigation]);
+  }, []);
 
   // Store user registration data passed from registration screen
   const route = navigation.getState().routes.find(
@@ -40,34 +37,37 @@ const OnboardingScreen = () => {
   );
   const userData = route?.params?.registrationData;
 
-  // If we have registration data, use it to log in automatically
-  useEffect(() => {
-    if (userData) {
-      dispatch(
-        login({
+  const goToHomeScreen = async () => {
+    try {
+      // If we have registration data, use it to log in automatically
+      if (userData?.email && userData?.password) {
+        await dispatch(login({
           email: userData.email,
-          password: userData.password,
-        })
-      );
-      // The Navigation component will handle redirecting to home screen once logged in
-    } else {
-      // Fallback to login screen if no registration data
-      navigation.navigate("LoginScreen");
+          password: userData.password
+        }));
+        // The Navigation component will handle redirecting to home screen once logged in
+      } else {
+        // Fallback to login screen if no registration data
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'LoginScreen' }],
+        });
+      }
+    } catch (error) {
+      console.error("Auto-login error:", error);
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'LoginScreen' }],
+      });
     }
-  }, [dispatch, navigation, userData]);
+  };
 
   const handleDone = () => {
-    navigation.reset({
-      index: 0,
-      routes: [{ name: "LoginScreen" }],
-    });
+    goToHomeScreen();
   };
 
   const handleSkip = () => {
-    navigation.reset({
-      index: 0,
-      routes: [{ name: "LoginScreen" }],
-    });
+    goToHomeScreen();
   };
 
   return (

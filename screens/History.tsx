@@ -1,11 +1,9 @@
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { useEffect } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSelector } from "react-redux";
 import WashCard from "../components/WashHistoryCard";
 import { useGetWashes } from "../hooks/useGetWashes";
-import { useTokenExpiration } from "../hooks/useTokenExpiration";
 import { HomepageStackParamList } from "../Navigation";
 import { RootState } from "../store/store";
 import { formatDate } from "../utils/formatDate";
@@ -19,15 +17,6 @@ export default function History() {
   const user = useSelector((state: RootState) => state.user.user_profile);
   const { isLoading, error, data } = useGetWashes(user.id);
   const navigation = useNavigation<NavigationProp>();
-  const { checkTokenBeforeAction } = useTokenExpiration();
-
-  useEffect(() => {
-    const validateToken = async () => {
-      await checkTokenBeforeAction(() => {});
-    };
-
-    validateToken();
-  }, []);
 
   const handleReportFeedback = (washLocation: string, id: unknown) => {
     navigation.navigate("FeedbackScreen", { washLocation: washLocation, washId: id });

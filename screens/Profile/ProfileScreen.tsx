@@ -96,13 +96,17 @@ export default function ProfileScreen() {
     checkTokenBeforeAction(async () => {
       setIsEditing(false);
 
+      const userToUpdateData = {
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        email: userData.email,
+        licensePlate: userData.licensePlate,
+      };
+
       try {
-        const response = await UserAPI.updateUserProfile(token, {
-          firstName: userData.firstName,
-          lastName: userData.lastName,
-          licensePlate: userData.licensePlate,
-        });
-        
+        // We will add the api call to update user profile directly in the UserAPI file when we merge this branch into dev
+        // Call backend update
+        const response = await UserAPI.updateUserProfile(token, userToUpdateData);
         setUserData(response); // Update local state with response data
         dispatch(updateUserProfile(response)); // Dispatch action to update Redux store
         // Show success alert

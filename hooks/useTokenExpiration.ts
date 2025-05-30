@@ -44,12 +44,18 @@ export const useTokenExpiration = () => {
   
   // Handle expired token by logging out
   const handleExpiredToken = async () => {
-    const isExpired = await isTokenExpired();
-    if (isExpired) {
+    try {
+      if (await isTokenExpired()) {
+        await SecureStore.deleteItemAsync('jwt');
+        dispatch(logout());
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Error handling expired token:', error);
       dispatch(logout());
       return true;
     }
-    return false;
   };
   
   // On mount, check token expiration

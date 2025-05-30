@@ -53,6 +53,7 @@ export type AuthStackParamList = {
 const AuthStackNavigator = createNativeStackNavigator<AuthStackParamList>();
 
 function AuthStack() {
+
   const currentRoute = useNavigationState(
     (state) => state?.routes?.[state.index]?.name
   );

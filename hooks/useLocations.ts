@@ -1,8 +1,5 @@
-import axios from "axios";
-import Constants from "expo-constants";
 import { useEffect, useState } from "react";
-
-const API_URL = Constants.expoConfig?.extra?.API_URL;
+import { LocationAPI } from "../APIs/LocationAPI";
 
 type Location = {
   uid: string;
@@ -23,10 +20,10 @@ export const useLocations = () => {
 
   const fetchLocations = async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/locations`);
-      setLocations(response.data);
+      const response = await LocationAPI.getLocations();
+      setLocations(response);
     } catch (error) {
-      // Handle error silently
+      console.error("Error fetching locations:", error);
     }
   };
 

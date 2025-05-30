@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { useDispatch } from "react-redux";
 import { AuthStackParamList } from "../../Navigation";
+import { LoginUserDto } from "../../redux/LoginUserDto";
 import { login } from "../../redux/userSlice";
 import { AppDispatch } from "../../store/store";
 
@@ -30,8 +31,8 @@ export default function LoginScreen() {
   const [password, setPassword] = React.useState("");
 
   // Handle login action
-  const handleLogin = async () => {
-    await dispatch(login({ email, password }));
+  const handleLogin = () => {
+    dispatch(login(new LoginUserDto(email, password)));
   };
 
   // Handle register action

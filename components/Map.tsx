@@ -53,17 +53,14 @@ export default function Map() {
   }>(null);
 
   const handleExtendedCallout = () => {
-    setExtendedMapCallout({
-      name: selectedLocation?.name,
-      address: selectedLocation?.address,
-      open_hours: selectedLocation?.open_hours,
-    });
-    setSelectedLocation(null);
-  };
-
-  const handleExtendedCalloutPress = () => {
-    setExtendedMapCallout(null);
-    setSelectedLocation(null);
+    if (selectedLocation) {
+      setExtendedMapCallout({
+        name: selectedLocation.name,
+        address: selectedLocation.address,
+        open_hours: selectedLocation.open_hours,
+      });
+      setSelectedLocation(null);
+    }
   };
 
   return (
@@ -129,7 +126,10 @@ export default function Map() {
             address={extendedMapCallout.name}
             open_hours={extendedMapCallout.open_hours}
             name={extendedMapCallout.address}
-            handleBackPress={handleExtendedCalloutPress}
+            handleBackPress={() => {
+              setExtendedMapCallout(null);
+              setSelectedLocation(null);
+            }}
           />
         </View>
       )}

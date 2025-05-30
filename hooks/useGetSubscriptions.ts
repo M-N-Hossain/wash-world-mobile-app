@@ -11,14 +11,15 @@ export type Subscription = {
   price: string;
 };
 
+const fetchSubscriptions = async (): Promise<Subscription[]> => {
+  const response = await axios.get(`${API_URL}/api/subscriptions`);
+  return response.data;
+};
+
 export const useGetSubscriptions = () => {
-  const fetchSubscriptions = async () => {
-    const response = await axios.get(`${API_URL}/api/subscriptions`);
-    return response.data;
-  };
 
   return useQuery({
-    queryKey: ["subscriptions"],
-    queryFn: fetchSubscriptions,
+    queryKey: ["subscription"],
+    queryFn: () => fetchSubscriptions(),
   });
 };

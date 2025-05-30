@@ -1,5 +1,6 @@
 import { StyleSheet, View } from "react-native";
 import { useSelector } from "react-redux";
+import { WashEntity } from "../../entities/RegisterWash";
 import { useRegisterWash } from "../../hooks/useRegisterWash";
 import { RootState } from "../../store/store";
 import ExtendedBottom from "./ExtendedBottom";
@@ -23,22 +24,27 @@ export default function MapCalloutExtended({
   const { mutate: registerWash, isPending, error } = useRegisterWash();
 
   // Function to handle registering a wash
-  const handleWashRegister = async () => {
-    try {
-      await registerWash({
-        userId: user.id,
-        washLocation: name,
-      });
-      setSuccessMessage("Wash registered successfully!");
-      setTimeout(() => {
-        setSuccessMessage("");
-      }, 3000);
-    } catch (error) {
-      setErrorMessage("Failed to register wash");
-      setTimeout(() => {
-        setErrorMessage("");
-      }, 3000);
-    }
+  const handleBeginWash = () => {
+    const wash_location = name;
+    const fk_user_id = user.id;
+    const reward = false;
+    const points_gained = 50;
+    const fk_reward_id = undefined;
+
+    const washEntity: WashEntity = new WashEntity(
+      wash_location,
+      fk_user_id,
+      reward,
+      points_gained,
+      fk_reward_id
+    );
+
+    registerWash(washEntity, {
+      onSuccess: () => {},
+      onError: (error) => {
+        console.error("Error registering wash:", error);
+      },
+    });
   };
 
   return (
@@ -49,7 +55,7 @@ export default function MapCalloutExtended({
         handleBackPress={handleBackPress}
       />
       <ExtendedBottom
-        handleBeginWash={handleWashRegister}
+        handleBeginWash={handleBeginWash}
         open_hours={open_hours}
       />
     </View>

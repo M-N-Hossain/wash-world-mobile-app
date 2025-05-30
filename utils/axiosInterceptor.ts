@@ -13,7 +13,10 @@ axiosInstance.interceptors.response.use(
     // Handle 401 (Unauthorized) errors, which indicate token expiration
     if (error.response && error.response.status === 401) {
       // Clear the token from SecureStore
-      SecureStore.deleteItemAsync("jwt");
+      await SecureStore.deleteItemAsync('jwt');
+      
+      // Instead of directly importing the store and actions (which creates circular dependencies),
+      // we'll use a callback that will be set after the store is created
     }
     return Promise.reject(error);
   }
@@ -25,16 +28,8 @@ export const setupLogoutHandler = (logoutFn: () => void) => {
     (response) => response,
     async (error) => {
       if (error.response && error.response.status === 401) {
-        // Handle 401 (Unauthorized) errors, which indicate token expiration
-        
-        // Clear the token from SecureStore
-        SecureStore.deleteItemAsync("jwt");
-        
-        // Instead of directly importing the store and actions (which creates circular dependencies),
-        // we'll use a callback that will be set after the store is created
-        if (logoutFn) {
-          logoutFn(); // Call the provided logout function
-        }
+        await SecureStore.deleteItemAsync('jwt');
+        logoutFn(); // Call the provided logout function
       }
       return Promise.reject(error);
     }
