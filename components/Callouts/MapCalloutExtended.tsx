@@ -5,6 +5,9 @@ import { useRegisterWash } from "../../hooks/useRegisterWash";
 import { WashEntity } from "../../entities/RegisterWash";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { HomepageStackParamList } from "../../Navigation";
+import { useNavigation } from "@react-navigation/native";
 
 type MapCalloutExtendedProps = {
   name: string;
@@ -19,6 +22,11 @@ export default function MapCalloutExtended({
   open_hours,
   handleBackPress,
 }: MapCalloutExtendedProps) {
+  type NavigationProp = NativeStackNavigationProp<
+    HomepageStackParamList,
+    "Locations"
+  >;
+  const navigation = useNavigation<NavigationProp>();
   const user = useSelector((state: RootState) => state.user.user_profile);
 
   const { mutate: registerWash, isPending, error } = useRegisterWash();
@@ -40,8 +48,13 @@ export default function MapCalloutExtended({
     );
 
     registerWash(washEntity, {
-      onSuccess: () => {
+      onSuccess: (response) => {
         console.log("Wash registered successfully");
+        navigation.navigate("StartWashingScreen", {
+          washId: response.data.id,
+          washLocation: wash_location,
+          licensePlate: user.licensePlate,
+        });
       },
       onError: (error) => {
         console.error("Error registering wash:", error);

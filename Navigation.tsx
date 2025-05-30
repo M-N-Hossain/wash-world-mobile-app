@@ -1,5 +1,8 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { NavigationContainer, useNavigationState } from "@react-navigation/native";
+import {
+  NavigationContainer,
+  useNavigationState,
+} from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as SecureStore from "expo-secure-store";
 import { House, MapPin, User } from "lucide-react-native";
@@ -8,9 +11,9 @@ import { useDispatch, useSelector } from "react-redux";
 import LoadingScreen from "./components/LoadingScreen";
 import { getUser, logout, reloadJwtFromStorage } from "./redux/userSlice";
 import { AppDispatch, RootState } from "./store/store";
+import { jwtDecode } from "jwt-decode";
 
 ///////////////////// Screens /////////////////////
-import { jwtDecode } from "jwt-decode";
 import LoginScreen from "./screens/Auth/Login";
 import RegisterScreen from "./screens/Auth/Register";
 import History from "./screens/History";
@@ -21,6 +24,7 @@ import MembershipOptionsScreen from "./screens/Profile/MembershipOptionsScreen";
 import ProfileScreen from "./screens/Profile/ProfileScreen";
 import FeedbackScreen from "./screens/Feedback";
 import FeedbackReportsScreen from "./screens/FeedbackReports";
+import StartWashingScreen from "./screens/StartWashingScreen";
 
 // This is the type for the Profile stack
 export type ProfileStackParamList = {
@@ -34,7 +38,12 @@ export type HomepageStackParamList = {
   Locations: undefined;
   History: undefined;
   FeedbackScreen: { washLocation: string; washId: unknown };
-  FeedbackReportsScreen: undefined
+  FeedbackReportsScreen: undefined;
+  StartWashingScreen: {
+    washId: number;
+    washLocation: string;
+    licensePlate: string;
+  };
 };
 
 // This is the type for the Auth stack
@@ -53,13 +62,12 @@ export type AuthStackParamList = {
 const AuthStackNavigator = createNativeStackNavigator<AuthStackParamList>();
 
 function AuthStack() {
-
   const currentRoute = useNavigationState(
     (state) => state?.routes?.[state.index]?.name
   );
-  
+
   console.log("Current route:", currentRoute);
-  
+
   return (
     <AuthStackNavigator.Navigator>
       <AuthStackNavigator.Screen
@@ -123,6 +131,10 @@ function HomepageStack() {
     <HomepageStackNavigator.Navigator screenOptions={{ headerShown: false }}>
       <HomepageStackNavigator.Screen name="Homepage" component={HomePage} />
       <HomepageStackNavigator.Screen name="Locations" component={Locations} />
+      <HomepageStackNavigator.Screen
+        name="StartWashingScreen"
+        component={StartWashingScreen}
+      />
       <HomepageStackNavigator.Screen
         name="FeedbackScreen"
         component={FeedbackScreen}
@@ -201,7 +213,6 @@ function BasicTabs() {
 }
 
 export default function Navigation() {
-  
   const token = useSelector((state: RootState) => state.user.token);
   const isLoadingUser = useSelector(
     (state: RootState) => state.user.isLoadingUser
@@ -214,9 +225,6 @@ export default function Navigation() {
   type DecodedToken = {
     exp: number;
   };
-
-  
-
 
   // Check for token expiration on app load
   useEffect(() => {
