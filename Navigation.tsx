@@ -1,5 +1,5 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, useNavigationState } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as SecureStore from "expo-secure-store";
 import { House, MapPin, User } from "lucide-react-native";
@@ -16,6 +16,7 @@ import RegisterScreen from "./screens/Auth/Register";
 import History from "./screens/History";
 import HomePage from "./screens/HomePage";
 import Locations from "./screens/locations";
+import OnboardingScreen from "./screens/Onboarding/OnboardingScreen";
 import MembershipOptionsScreen from "./screens/Profile/MembershipOptionsScreen";
 import ProfileScreen from "./screens/Profile/ProfileScreen";
 
@@ -36,22 +37,27 @@ export type HomepageStackParamList = {
 export type AuthStackParamList = {
   LoginScreen: undefined;
   RegisterScreen: undefined;
-  OnboardingScreen: undefined;
+  OnboardingScreen: {
+    registrationData?: {
+      email: string;
+      password: string;
+    };
+  };
 };
 
 // Auth stack
 const AuthStackNavigator = createNativeStackNavigator<AuthStackParamList>();
 
 function AuthStack() {
+
+  const currentRoute = useNavigationState(
+    (state) => state?.routes?.[state.index]?.name
+  );
+  
+  console.log("Current route:", currentRoute);
+  
   return (
     <AuthStackNavigator.Navigator>
-      {/* <AuthStackNavigator.Screen
-        name="OnboardingScreen"
-        component={OnboardingScreen}
-        options={{
-          headerShown: false,
-        }}
-      /> */}
       <AuthStackNavigator.Screen
         name="LoginScreen"
         component={LoginScreen}
@@ -65,6 +71,13 @@ function AuthStack() {
         component={RegisterScreen}
         options={{
           title: "Register",
+          headerShown: false,
+        }}
+      />
+      <AuthStackNavigator.Screen
+        name="OnboardingScreen"
+        component={OnboardingScreen}
+        options={{
           headerShown: false,
         }}
       />
@@ -164,6 +177,7 @@ function BasicTabs() {
 }
 
 export default function Navigation() {
+  
   const token = useSelector((state: RootState) => state.user.token);
   const isLoadingUser = useSelector(
     (state: RootState) => state.user.isLoadingUser
@@ -176,6 +190,9 @@ export default function Navigation() {
   type DecodedToken = {
     exp: number;
   };
+
+  
+
 
   // Check for token expiration on app load
   useEffect(() => {

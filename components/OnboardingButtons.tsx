@@ -1,6 +1,6 @@
-import React from "react";
-import { TouchableOpacity, Text, StyleSheet, View } from "react-native";
 import { ArrowRight } from "lucide-react-native";
+import React from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 // Skip button
 export const Skip = ({ ...props }) => (
@@ -48,5 +48,16 @@ const styles = StyleSheet.create({
     backgroundColor: "#0AC267",
     justifyContent: "center",
     alignItems: "center",
+  },
+  doneButton: {
+    backgroundColor: "#0AC267",
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
+  doneText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
   },
 });
