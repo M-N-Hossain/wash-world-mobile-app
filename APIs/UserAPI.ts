@@ -23,7 +23,6 @@ export class UserAPI {
         `${this.API_URL}/auth/login`,
         userDto
       );
-      // console.log("Full response from backend:", response.data);
       return response.data;
     } catch (error) {
       console.error("Error logging in user:", error);
@@ -44,8 +43,6 @@ export class UserAPI {
   }
 
   static async getUserById(token: string) {
-    console.log(API_URL);
-
     try {
       const decodedToken = jwtDecode(token) as DecodedToken;
       const response = await axiosInstance.get(

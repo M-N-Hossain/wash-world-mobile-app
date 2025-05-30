@@ -3,23 +3,23 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ArrowUpRight, MessageCircleHeart } from "lucide-react-native";
 import React, { useEffect } from "react";
 import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { useSelector } from "react-redux";
+import FeedbackReportCard from "../components/FeedbackReportCard";
 import Header from "../components/Header";
 import LiveStatusCard from "../components/LiveStatusCard";
 import WashCard from "../components/WashHistoryCard";
+import { useGetFeedbackReports } from "../hooks/useGetFeedbackReports";
 import { useGetWashes } from "../hooks/useGetWashes";
 import { useTokenExpiration } from "../hooks/useTokenExpiration";
 import { HomepageStackParamList } from "../Navigation";
 import { RootState } from "../store/store";
 import { formatDate } from "../utils/formatDate";
-import FeedbackReportCard from "../components/FeedbackReportCard";
-import { useGetFeedbackReports } from "../hooks/useGetFeedbackReports";
 
 export default function HomePage() {
   type NavigationProp = NativeStackNavigationProp<
@@ -31,7 +31,6 @@ export default function HomePage() {
   const { checkTokenBeforeAction } = useTokenExpiration();
 
   const handleFeedbackPress = () => {
-    // console.log("See all feedback reports");
     checkTokenBeforeAction(() => {
       navigation.navigate("FeedbackReportsScreen");
     });
@@ -58,9 +57,7 @@ export default function HomePage() {
   // Check token on component mount
   useEffect(() => {
     const validateToken = async () => {
-      await checkTokenBeforeAction(() => {
-        console.log("Token is valid on HomePage mount");
-      });
+      await checkTokenBeforeAction(() => {});
     };
 
     validateToken();

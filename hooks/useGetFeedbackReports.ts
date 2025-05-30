@@ -1,9 +1,9 @@
-import Constants from "expo-constants";
-import { RootState } from "../store/store";
-import { useSelector } from "react-redux";
-import { useTokenExpiration } from "./useTokenExpiration";
-import axiosInstance from "../utils/axiosInterceptor";
 import { useQuery } from "@tanstack/react-query";
+import Constants from "expo-constants";
+import { useSelector } from "react-redux";
+import { RootState } from "../store/store";
+import axiosInstance from "../utils/axiosInterceptor";
+import { useTokenExpiration } from "./useTokenExpiration";
 
 const API_URL = Constants.expoConfig?.extra?.API_URL;
 
@@ -25,7 +25,6 @@ export const useGetFeedbackReports = (id: number) => {
         "Content-Type": "application/json",
       },
     });
-    // console.log(`Fetched reports for user ID ${id}`, response.data);
 
     return response.data;
   };

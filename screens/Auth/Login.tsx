@@ -1,21 +1,19 @@
-import React from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  SafeAreaView,
-  Pressable,
-} from "react-native";
-import { Mail, Lock, ChevronLeft } from "lucide-react-native";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../store/store";
-import { LoginUserDto } from "../../redux/LoginUserDto";
-import { login } from "../../redux/userSlice";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { Lock, Mail } from "lucide-react-native";
+import React from "react";
+import {
+    SafeAreaView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
+} from "react-native";
+import { useDispatch } from "react-redux";
 import { AuthStackParamList } from "../../Navigation";
+import { login } from "../../redux/userSlice";
+import { AppDispatch } from "../../store/store";
 
 export default function LoginScreen() {
   const dispatch = useDispatch<AppDispatch>();
@@ -32,14 +30,12 @@ export default function LoginScreen() {
   const [password, setPassword] = React.useState("");
 
   // Handle login action
-  const handleLogin = () => {
-    // console.log("Login button pressed");
-    dispatch(login(new LoginUserDto(email, password)));
+  const handleLogin = async () => {
+    await dispatch(login({ email, password }));
   };
 
   // Handle register action
   const handleRegister = () => {
-    // console.log("Register button pressed");
     navigation.navigate("RegisterScreen");
   };
 

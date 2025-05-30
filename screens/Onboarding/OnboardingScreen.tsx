@@ -25,55 +25,49 @@ const OnboardingScreen = () => {
   // Auto navigate to home after 30 seconds
   useEffect(() => {
     const timer = setTimeout(() => {
-      goToHomeScreen();
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "LoginScreen" }],
+      });
     }, 30000); // 30 seconds
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [navigation]);
 
   // Store user registration data passed from registration screen
   const route = navigation.getState().routes.find(
     r => r.name === "OnboardingScreen"
   );
   const userData = route?.params?.registrationData;
-  
-  console.log("OnboardingScreen - userData:", userData);
 
-  const goToHomeScreen = async () => {
-    try {
-      console.log("Attempting to go to home screen with userData:", userData);
-      // If we have registration data, use it to log in automatically
-      if (userData?.email && userData?.password) {
-        console.log("Logging in with:", userData.email);
-        await dispatch(login({
+  // If we have registration data, use it to log in automatically
+  useEffect(() => {
+    if (userData) {
+      dispatch(
+        login({
           email: userData.email,
-          password: userData.password
-        }));
-        console.log("Login dispatched successfully");
-        // The Navigation component will handle redirecting to home screen once logged in
-      } else {
-        console.log("No user data, redirecting to login");
-        // Fallback to login screen if no registration data
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'LoginScreen' }],
-        });
-      }
-    } catch (error) {
-      console.error("Auto-login error:", error);
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'LoginScreen' }],
-      });
+          password: userData.password,
+        })
+      );
+      // The Navigation component will handle redirecting to home screen once logged in
+    } else {
+      // Fallback to login screen if no registration data
+      navigation.navigate("LoginScreen");
     }
-  };
+  }, [dispatch, navigation, userData]);
 
   const handleDone = () => {
-    goToHomeScreen();
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "LoginScreen" }],
+    });
   };
 
   const handleSkip = () => {
-    goToHomeScreen();
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "LoginScreen" }],
+    });
   };
 
   return (

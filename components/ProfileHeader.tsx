@@ -1,13 +1,12 @@
 import React from "react";
-import { View, Text, Image, StyleSheet } from "react-native";
-import { AppDispatch, RootState } from "../store/store";
+import { Image, StyleSheet, Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../store/store";
 
 export default function ProfileHeader() {
   const dispatch = useDispatch<AppDispatch>();
 
   const user = useSelector((state: RootState) => state.user.user_profile);
-  console.log("User profile in ProfileHeader:", user);
 
   return (
     <View style={styles.container}>

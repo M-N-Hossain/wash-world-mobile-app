@@ -13,14 +13,14 @@ import { AppDispatch, RootState } from "./store/store";
 import { jwtDecode } from "jwt-decode";
 import LoginScreen from "./screens/Auth/Login";
 import RegisterScreen from "./screens/Auth/Register";
+import FeedbackScreen from "./screens/Feedback";
+import FeedbackReportsScreen from "./screens/FeedbackReports";
 import History from "./screens/History";
 import HomePage from "./screens/HomePage";
 import Locations from "./screens/locations";
 import OnboardingScreen from "./screens/Onboarding/OnboardingScreen";
 import MembershipOptionsScreen from "./screens/Profile/MembershipOptionsScreen";
 import ProfileScreen from "./screens/Profile/ProfileScreen";
-import FeedbackScreen from "./screens/Feedback";
-import FeedbackReportsScreen from "./screens/FeedbackReports";
 
 // This is the type for the Profile stack
 export type ProfileStackParamList = {
@@ -53,12 +53,9 @@ export type AuthStackParamList = {
 const AuthStackNavigator = createNativeStackNavigator<AuthStackParamList>();
 
 function AuthStack() {
-
   const currentRoute = useNavigationState(
     (state) => state?.routes?.[state.index]?.name
   );
-  
-  console.log("Current route:", currentRoute);
   
   return (
     <AuthStackNavigator.Navigator>
@@ -238,7 +235,6 @@ export default function Navigation() {
 
           // If token is expired, log out immediately
           if (timeUntilExpiry <= 0) {
-            console.log("Token expired, logging out");
             await SecureStore.deleteItemAsync("jwt");
             dispatch(logout());
             return;

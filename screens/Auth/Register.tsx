@@ -14,7 +14,7 @@ import {
 import RNPickerSelect from 'react-native-picker-select';
 import { useDispatch } from "react-redux";
 import { UserAPI } from "../../APIs/UserAPI";
-import { useGetSubscriptions } from "../../hooks/useGetSubscriptions";
+import { Subscription, useGetSubscriptions } from "../../hooks/useGetSubscriptions";
 import { AuthStackParamList } from "../../Navigation";
 import { AppDispatch } from "../../store/store";
 
@@ -67,8 +67,11 @@ export default function RegisterScreen() {
     }
   };
 
-  const { isLoading, isError, data, error } = useGetSubscriptions();
-  console.log("Subscriptions data:", data);
+  const {
+    isLoading: subscriptionsLoading,
+    error: subscriptionsError,
+    data
+  } = useGetSubscriptions();
 
   return (
     <SafeAreaView style={styles.container}>
@@ -122,9 +125,9 @@ export default function RegisterScreen() {
       </View>
 
       {/* Membership Input */}
-      {isLoading ? (
+      {subscriptionsLoading ? (
         <Text>Loading memberships...</Text>
-      ) : error ? (
+      ) : subscriptionsError ? (
         <Text>Error loading memberships</Text>
       ) : (
         <View style={styles.pickerContainer}>
@@ -133,7 +136,7 @@ export default function RegisterScreen() {
             value={subscriptionId}
             placeholder={{ label: "Select membership", value: "" }}
             items={
-              data?.map((sub) => ({ label: sub.tierName, value: sub.id })) || []
+              data?.map((sub: Subscription) => ({ label: sub.tierName, value: sub.id })) || []
             }
             style={{
               inputIOS: {
