@@ -1,4 +1,5 @@
-import { Picker } from "@react-native-picker/picker";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ChevronLeft, Lock, Mail } from "lucide-react-native";
 import React from "react";
 import {
@@ -10,13 +11,16 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import RNPickerSelect from 'react-native-picker-select';
 import { useDispatch } from "react-redux";
+import { UserAPI } from "../../APIs/UserAPI";
 import { useGetSubscriptions } from "../../hooks/useGetSubscriptions";
-import { signup } from "../../redux/userSlice";
+import { AuthStackParamList } from "../../Navigation";
 import { AppDispatch } from "../../store/store";
 
 export default function RegisterScreen() {
   const dispatch = useDispatch<AppDispatch>();
+  const navigation = useNavigation<NavigationProp>();
 
   const [firstName, setFirstName] = React.useState("");
   const [lastName, setLastName] = React.useState("");
@@ -24,20 +28,43 @@ export default function RegisterScreen() {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [subscriptionId, setSubscriptionId] = React.useState("");
+  const [isRegistering, setIsRegistering] = React.useState(false);
+  const [errorMessage, setErrorMessage] = React.useState("");
+
+  type NavigationProp = NativeStackNavigationProp<
+  AuthStackParamList,
+  "OnboardingScreen"
+>;
 
   // Handle register action
-  const handleRegister = () => {
-    dispatch(
-      signup({
+  const handleRegister = async () => {
+    try {
+      setIsRegistering(true);
+      setErrorMessage("");
+      
+      // Make API call directly without using the Redux action
+      await UserAPI.signupUser({
         firstName,
         lastName,
         licensePlate,
         email,
         password,
-        subscriptionId:  '26fa4dea-5f91-4131-ba98-87d36722f729'
-      })
-    );
-    
+        subscriptionId: subscriptionId || "26fa4dea-5f91-4131-ba98-87d36722f729"
+      });
+      
+      // If successful, navigate to onboarding with registration data
+      navigation.replace("OnboardingScreen", {
+        registrationData: {
+          email,
+          password
+        }
+      });
+    } catch (error) {
+      console.error("Registration error:", error);
+      setErrorMessage("Registration failed. Please try again.");
+    } finally {
+      setIsRegistering(false);
+    }
   };
 
   const { isLoading, isError, data, error } = useGetSubscriptions();
@@ -46,7 +73,7 @@ export default function RegisterScreen() {
   return (
     <SafeAreaView style={styles.container}>
       {/* Back Button */}
-      <Pressable style={styles.backButton}>
+      <Pressable style={styles.backButton} onPress={() => navigation.navigate("LoginScreen")}>
         <View style={styles.iconWrapper}>
           <ChevronLeft size={24} />
         </View>
@@ -68,9 +95,6 @@ export default function RegisterScreen() {
           value={firstName}
           onChangeText={setFirstName}
         />
-        <View style={styles.iconWrapper}>
-          <Mail size={20} />
-        </View>
       </View>
 
       {/* LastName Input */}
@@ -83,9 +107,6 @@ export default function RegisterScreen() {
           value={lastName}
           onChangeText={setLastName}
         />
-        <View style={styles.iconWrapper}>
-          <Mail size={20} />
-        </View>
       </View>
 
       {/* LicensePlate Input */}
@@ -98,9 +119,6 @@ export default function RegisterScreen() {
           value={licensePlate}
           onChangeText={setLicensePlate}
         />
-        <View style={styles.iconWrapper}>
-          <Mail size={20} />
-        </View>
       </View>
 
       {/* Membership Input */}
@@ -110,19 +128,50 @@ export default function RegisterScreen() {
         <Text>Error loading memberships</Text>
       ) : (
         <View style={styles.pickerContainer}>
-          <Picker
-            selectedValue={subscriptionId}
-            onValueChange={(itemValue) => setSubscriptionId(itemValue)}
-            style={styles.picker}
-          >
-            <Picker.Item label="Select membership" value="" />
-            {data?.map((sub) => (
-              <Picker.Item key={sub.id} label={sub.tierName} value={sub.id} />
-            ))}
-          </Picker>
+          <RNPickerSelect
+            onValueChange={setSubscriptionId}
+            value={subscriptionId}
+            placeholder={{ label: "Select membership", value: "" }}
+            items={
+              data?.map((sub) => ({ label: sub.tierName, value: sub.id })) || []
+            }
+            style={{
+              inputIOS: {
+                fontSize: 16,
+                paddingVertical: 12,
+                paddingHorizontal: 10,
+                color: "#000",
+              },
+              inputAndroid: {
+                fontSize: 16,
+                paddingHorizontal: 10,
+                paddingVertical: 8,
+                color: "#000",
+              },
+              placeholder: {
+                color: "#999",
+              },
+              iconContainer: {
+                top: 16,
+                right: 12,
+              },
+            }}
+            useNativeAndroidPickerStyle={false}
+            Icon={() => (
+              <View style={{ top: 0, right: 2, position: "absolute" }}>
+                <ChevronLeft
+                  size={20}
+                  style={{ transform: [{ rotate: "270deg" }] }}
+                  color="#999"
+                />
+              </View>
+            )}
+            textInputProps={{
+              pointerEvents: "none",
+            }}
+          />
         </View>
       )}
-
 
       {/* Email Input */}
       <View style={styles.inputContainer}>
@@ -169,17 +218,23 @@ export default function RegisterScreen() {
 
       {/* Register Button */}
       <TouchableOpacity
-        style={[styles.button, styles.buttonDisabled]}
+        style={[styles.button, isRegistering ? styles.buttonDisabled : styles.buttonActive]}
         onPress={handleRegister}
+        disabled={isRegistering}
       >
-        <Text style={styles.buttonText}>Register</Text>
+        <Text style={styles.buttonText}>{isRegistering ? "Registering..." : "Register"}</Text>
       </TouchableOpacity>
+
+      {/* Error message */}
+      {errorMessage ? (
+        <Text style={styles.errorText}>{errorMessage}</Text>
+      ) : null}
 
       {/* Footer */}
       <View style={styles.footer}>
         <Text style={styles.footerText}>
           Already have an account?{" "}
-          <Text style={styles.link}>Login instead</Text>
+          <Text style={styles.link} onPress={() => navigation.navigate("LoginScreen")}>Login instead</Text>
         </Text>
       </View>
     </SafeAreaView>
@@ -258,11 +313,10 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     borderRadius: 8,
     marginTop: 12,
-    overflow: "hidden",
   },
-  picker: {
-    height: 50,
-    width: "100%",
-    color: "#000",
+  errorText: {
+    color: "red",
+    marginTop: 12,
+    textAlign: "center",
   },
 });

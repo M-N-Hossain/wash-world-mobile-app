@@ -9,6 +9,11 @@ import {
   Alert,
 } from "react-native";
 import { Star } from "lucide-react-native";
+import { useRoute } from "@react-navigation/native";
+import { useSelector } from "react-redux";
+import { RootState } from "../store/store";
+import { useRegisterFeedback } from "../hooks/useRegisterFeedback";
+import { Feedback } from "../entities/RegisterFeedback";
 
 const reasonsList = [
   "Location",
@@ -18,30 +23,48 @@ const reasonsList = [
   "Cleanliness",
   "Other",
 ];
+type FeedbackScreenRouteParams = {
+  washLocation: string;
+  washId: string;
+};
 
 const FeedbackScreen = () => {
+  const route = useRoute();
+  const { washLocation, washId } = (route.params ||
+    {}) as FeedbackScreenRouteParams;
+
   const [rating, setRating] = useState(0);
-  const [selectedReasons, setSelectedReasons] = useState<string[]>([]);
-  const [comment, setComment] = useState("");
+  const [selectedReason, setSelectedReason] = useState<string>("");
+  const [description, setDescription] = useState("");
+
+  const user = useSelector((state: RootState) => state.user.user_profile);
+  const userId = user.id;
 
   const toggleReason = (reason: string) => {
-    setSelectedReasons((prev) =>
-      prev.includes(reason)
-        ? prev.filter((r) => r !== reason)
-        : [...prev, reason]
-    );
+    setSelectedReason((prev) => (prev === reason ? "" : reason));
   };
 
-  const handleSubmit = () => {
-    const feedback = {
-      rating,
-      reasons: selectedReasons,
-      comment,
-    };
+  const { mutate: registerFeedback, isPending, error } = useRegisterFeedback();
 
-    // TODO: Replace with actual backend API call
-    console.log("Feedback submitted:", feedback);
-    Alert.alert("Thank you!", "Your feedback has been submitted.");
+  const handleSubmit = () => {
+    const feedback: Feedback = new Feedback(
+      selectedReason,
+      description,
+      String(rating),
+      String(userId),
+      String(washId),
+      washLocation
+    );
+
+    registerFeedback(feedback, {
+      onSuccess: () => {
+        Alert.alert("Thank you!", "Your feedback has been submitted.");
+      },
+      onError: () => {
+        Alert.alert("There has been a problem with your feedback report, please try again later");
+        console.error("Error registering feedback:", error)
+      }
+    });
   };
 
   return (
@@ -70,14 +93,14 @@ const FeedbackScreen = () => {
             key={reason}
             style={[
               styles.reasonButton,
-              selectedReasons.includes(reason) && styles.reasonButtonSelected,
+              selectedReason === reason && styles.reasonButtonSelected,
             ]}
             onPress={() => toggleReason(reason)}
           >
             <Text
               style={[
                 styles.reasonText,
-                selectedReasons.includes(reason) && styles.reasonTextSelected,
+                selectedReason === reason && styles.reasonTextSelected,
               ]}
             >
               {reason}
@@ -90,8 +113,8 @@ const FeedbackScreen = () => {
         style={styles.commentBox}
         placeholder="Anything you would like to share?"
         multiline
-        value={comment}
-        onChangeText={setComment}
+        value={description}
+        onChangeText={setDescription}
       />
 
       <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit}>

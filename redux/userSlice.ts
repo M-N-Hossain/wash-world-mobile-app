@@ -40,7 +40,7 @@ export const getUser = createAsyncThunk(
   "auth/getUser",
   async (token: string, thunkApi) => {
     const response = await UserAPI.getUserById(token);
-    console.log("User profile fetched:", response);
+    // console.log("User profile fetched:", response);
     return response
   }
 );

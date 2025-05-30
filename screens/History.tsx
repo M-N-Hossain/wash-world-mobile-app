@@ -4,10 +4,24 @@ import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { useGetWashes } from "../hooks/useGetWashes";
 import { formatDate } from "../utils/formatDate";
+import { useNavigation } from "@react-navigation/native";
+import { HomepageStackParamList } from "../Navigation";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 export default function History() {
+  type NavigationProp = NativeStackNavigationProp<
+    HomepageStackParamList,
+    "FeedbackScreen"
+  >;
+
   const user = useSelector((state: RootState) => state.user.user_profile);
   const { isLoading, error, data } = useGetWashes(user.id);
+  const navigation = useNavigation<NavigationProp>();
+
+  const handleReportFeedback = (washLocation: string, id: unknown) => {
+    console.log("hi from");
+    navigation.navigate("FeedbackScreen", { washLocation: washLocation, washId: id });
+  };
 
   return (
     <View style={styles.container}>
@@ -26,14 +40,17 @@ export default function History() {
         {data &&
           data.map(
             (wash: {
-              wash_id: React.Key;
-              wash_location: string;
-              wash_date: string;
+              id: React.Key;
+              washLocation: string;
+              washDatetime: string;
             }) => (
               <WashCard
-                key={wash.wash_id}
-                name={wash.wash_location}
-                date={formatDate(wash.wash_date)}
+                key={wash.id}
+                name={wash.washLocation}
+                date={formatDate(wash.washDatetime)}
+                onReportIssue={() =>
+                  handleReportFeedback(wash.washLocation, wash.id)
+                }
               />
             )
           )}
