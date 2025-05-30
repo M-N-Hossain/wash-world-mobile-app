@@ -5,55 +5,38 @@ import * as SecureStore from "expo-secure-store";
 import { House, MapPin, User } from "lucide-react-native";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import LoadingScreen from "./components/LoadingScreen";
-import { getUser, logout, reloadJwtFromStorage } from "./redux/userSlice";
-import { AppDispatch, RootState } from "./store/store";
 
-///////////////////// Screens /////////////////////
+// Components
+import LoadingScreen from "../components/LoadingScreen";
+
+// Auth and Redux
 import { jwtDecode } from "jwt-decode";
-import LoginScreen from "./screens/Auth/Login";
-import RegisterScreen from "./screens/Auth/Register";
-import FeedbackScreen from "./screens/Feedback";
-import FeedbackReportsScreen from "./screens/FeedbackReports";
-import History from "./screens/History";
-import HomePage from "./screens/HomePage";
-import Locations from "./screens/locations";
-import OnboardingScreen from "./screens/Onboarding/OnboardingScreen";
-import MembershipOptionsScreen from "./screens/Profile/MembershipOptionsScreen";
-import ProfileScreen from "./screens/Profile/ProfileScreen";
+import { AppDispatch, RootState } from "../store";
+import { getUser, logout, reloadJwtFromStorage } from "../store/slices/userSlice";
 
-// This is the type for the Profile stack
-export type ProfileStackParamList = {
-  ProfileScreen: undefined;
-  MembershipOptionsScreen: undefined;
-};
+// Types
+import {
+    AuthStackParamList,
+    HomepageStackParamList,
+    ProfileStackParamList
+} from "./types";
 
-// This is the type for the Homepage stack
-export type HomepageStackParamList = {
-  Homepage: undefined;
-  Locations: undefined;
-  History: undefined;
-  FeedbackScreen: { washLocation: string; washId: unknown };
-  FeedbackReportsScreen: undefined
-};
-
-// This is the type for the Auth stack
-export type AuthStackParamList = {
-  LoginScreen: undefined;
-  RegisterScreen: undefined;
-  OnboardingScreen: {
-    registrationData?: {
-      email: string;
-      password: string;
-    };
-  };
-};
+// Screens
+import LoginScreen from "../screens/Auth/Login";
+import RegisterScreen from "../screens/Auth/Register";
+import FeedbackScreen from "../screens/Feedback";
+import FeedbackReportsScreen from "../screens/FeedbackReports";
+import History from "../screens/History";
+import HomePage from "../screens/HomePage";
+import Locations from "../screens/locations";
+import OnboardingScreen from "../screens/Onboarding/OnboardingScreen";
+import MembershipOptionsScreen from "../screens/Profile/MembershipOptionsScreen";
+import ProfileScreen from "../screens/Profile/ProfileScreen";
 
 // Auth stack
 const AuthStackNavigator = createNativeStackNavigator<AuthStackParamList>();
 
 function AuthStack() {
-
   const currentRoute = useNavigationState(
     (state) => state?.routes?.[state.index]?.name
   );
@@ -213,9 +196,6 @@ export default function Navigation() {
     exp: number;
   };
 
-  
-
-
   // Check for token expiration on app load
   useEffect(() => {
     const checkTokenExpiration = async () => {
@@ -273,4 +253,4 @@ export default function Navigation() {
       )}
     </NavigationContainer>
   );
-}
+} 

@@ -1,26 +1,14 @@
 import { jwtDecode } from "jwt-decode";
-import { CreateUserDto } from "../redux/CreateUserDto";
-import { LoginUserDto } from "../redux/LoginUserDto";
 import axiosInstance from "../utils/axiosInterceptor";
+import { API_URL } from "../constants/api";
+import { CreateUserDto, LoginUserDto } from "../types/auth";
+import { DecodedToken } from "../types/api";
 
-import Constants from "expo-constants";
-
-const API_URL = Constants.expoConfig?.extra?.API_URL;
-type DecodedToken = {
-  email: string;
-  exp: number;
-  iat: number;
-  licensePlate: string;
-  subscriptionId: string;
-  id: string;
-};
-export class UserAPI {
-  static API_URL = API_URL;
-
-  static async loginUser(userDto: LoginUserDto) {
+class UserService {
+  async loginUser(userDto: LoginUserDto) {
     try {
       const response = await axiosInstance.post(
-        `${this.API_URL}/auth/login`,
+        `${API_URL}/auth/login`,
         userDto
       );
       return response.data;
@@ -29,10 +17,11 @@ export class UserAPI {
       throw error;
     }
   }
-  static async signupUser(userDto: CreateUserDto) {
+
+  async signupUser(userDto: CreateUserDto) {
     try {
       const response = await axiosInstance.post(
-        `${this.API_URL}/auth/signup`,
+        `${API_URL}/auth/signup`,
         userDto
       );
       return response.data;
@@ -42,11 +31,11 @@ export class UserAPI {
     }
   }
 
-  static async getUserById(token: string) {
+  async getUserById(token: string) {
     try {
       const decodedToken = jwtDecode(token) as DecodedToken;
       const response = await axiosInstance.get(
-        `${this.API_URL}/api/users/${decodedToken.id}`,
+        `${API_URL}/api/users/${decodedToken.id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -59,11 +48,12 @@ export class UserAPI {
       throw error;
     }
   }
-  static async updateUserProfile(token: string, userData: any) {
+
+  async updateUserProfile(token: string, userData: any) {
     try {
       const decodedToken = jwtDecode(token) as DecodedToken;
       const response = await axiosInstance.put(
-        `${this.API_URL}/api/users/${decodedToken.id}`,
+        `${API_URL}/api/users/${decodedToken.id}`,
         userData,
         {
           headers: {
@@ -78,3 +68,5 @@ export class UserAPI {
     }
   }
 }
+
+export default new UserService(); 

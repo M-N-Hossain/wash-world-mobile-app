@@ -17,8 +17,8 @@ import WashCard from "../components/WashHistoryCard";
 import { useGetFeedbackReports } from "../hooks/useGetFeedbackReports";
 import { useGetWashes } from "../hooks/useGetWashes";
 import { useTokenExpiration } from "../hooks/useTokenExpiration";
-import { HomepageStackParamList } from "../Navigation";
-import { RootState } from "../store/store";
+import { HomepageStackParamList } from "../navigation/types";
+import { RootState } from "../store";
 import { formatDate } from "../utils/formatDate";
 
 export default function HomePage() {

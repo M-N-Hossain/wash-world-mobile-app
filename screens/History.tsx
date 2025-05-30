@@ -4,8 +4,8 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSelector } from "react-redux";
 import WashCard from "../components/WashHistoryCard";
 import { useGetWashes } from "../hooks/useGetWashes";
-import { HomepageStackParamList } from "../Navigation";
-import { RootState } from "../store/store";
+import { HomepageStackParamList } from "../navigation/types";
+import { RootState } from "../store";
 import { formatDate } from "../utils/formatDate";
 
 export default function History() {

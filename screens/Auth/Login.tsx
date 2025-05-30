@@ -11,10 +11,10 @@ import {
     View
 } from "react-native";
 import { useDispatch } from "react-redux";
-import { AuthStackParamList } from "../../Navigation";
-import { LoginUserDto } from "../../redux/LoginUserDto";
-import { login } from "../../redux/userSlice";
-import { AppDispatch } from "../../store/store";
+import { AuthStackParamList } from "../../navigation/types";
+import { AppDispatch } from "../../store";
+import { login } from "../../store/slices/userSlice";
+import { LoginUserDto } from "../../types/auth";
 
 export default function LoginScreen() {
   const dispatch = useDispatch<AppDispatch>();

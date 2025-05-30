@@ -10,14 +10,15 @@ import {
     View,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import { UserAPI } from "../../APIs/UserAPI";
-import { ProfileStackParamList } from "../../Navigation";
+import userService from "../../services/userService";
+import { ProfileStackParamList } from "../../navigation/types";
 import AlertMessage from "../../components/AlertMessage";
 import ProfileHeader from "../../components/ProfileHeader";
 import ProfileSection from "../../components/ProfileSection";
 import { useTokenExpiration } from "../../hooks/useTokenExpiration";
-import { updateUserProfile } from "../../redux/userSlice";
-import { AppDispatch, RootState } from "../../store/store";
+import { updateUserProfile } from "../../store/slices/userSlice";
+import { RootState } from "../../store";
+import { AppDispatch } from "../../store";
 
 export default function ProfileScreen() {
   type NavigationProp = NativeStackNavigationProp<
@@ -104,9 +105,8 @@ export default function ProfileScreen() {
       };
 
       try {
-        // We will add the api call to update user profile directly in the UserAPI file when we merge this branch into dev
         // Call backend update
-        const response = await UserAPI.updateUserProfile(token, userToUpdateData);
+        const response = await userService.updateUserProfile(token, userToUpdateData);
         setUserData(response); // Update local state with response data
         dispatch(updateUserProfile(response)); // Dispatch action to update Redux store
         // Show success alert

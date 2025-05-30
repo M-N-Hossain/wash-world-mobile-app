@@ -2,9 +2,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { StyleSheet } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Provider } from "react-redux";
-import Navigation from "./Navigation";
-import { logout } from "./redux/userSlice";
-import { store } from "./store/store";
+import Navigation from "./navigation";
+import { store } from "./store";
+import { logout } from "./store/slices/userSlice";
 import { setupLogoutHandler } from "./utils/axiosInterceptor";
 
 const queryClient = new QueryClient();

@@ -5,9 +5,9 @@ import { BackHandler, Image } from "react-native";
 import Onboarding from "react-native-onboarding-swiper";
 import { useDispatch } from "react-redux";
 import { Done, Next, Skip } from "../../components/OnboardingButtons";
-import { AuthStackParamList } from "../../Navigation";
-import { login } from "../../redux/userSlice";
-import { AppDispatch } from "../../store/store";
+import { AuthStackParamList } from "../../navigation/types";
+import { AppDispatch } from "../../store";
+import { login } from "../../store/slices/userSlice";
 
 const OnboardingScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
@@ -36,7 +36,7 @@ const OnboardingScreen = () => {
     r => r.name === "OnboardingScreen"
   );
   const userData = route?.params?.registrationData;
-
+  
   const goToHomeScreen = async () => {
     try {
       // If we have registration data, use it to log in automatically

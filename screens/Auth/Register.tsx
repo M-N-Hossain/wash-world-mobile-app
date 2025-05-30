@@ -1,22 +1,21 @@
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { ChevronLeft, Lock, Mail } from "lucide-react-native";
+import { Lock, Mail, UserCircle } from "lucide-react-native";
 import React from "react";
 import {
-  Pressable,
   SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import RNPickerSelect from 'react-native-picker-select';
 import { useDispatch } from "react-redux";
-import { UserAPI } from "../../APIs/UserAPI";
 import { useGetSubscriptions } from "../../hooks/useGetSubscriptions";
-import { AuthStackParamList } from "../../Navigation";
-import { AppDispatch } from "../../store/store";
+import { AuthStackParamList } from "../../navigation/types";
+import userService from "../../services/userService";
+import { AppDispatch } from "../../store";
 
 export default function RegisterScreen() {
   const dispatch = useDispatch<AppDispatch>();
@@ -43,7 +42,7 @@ export default function RegisterScreen() {
       setErrorMessage("");
       
       // Make API call directly without using the Redux action
-      await UserAPI.signupUser({
+      await userService.signupUser({
         firstName,
         lastName,
         licensePlate,
@@ -72,11 +71,11 @@ export default function RegisterScreen() {
   return (
     <SafeAreaView style={styles.container}>
       {/* Back Button */}
-      <Pressable style={styles.backButton} onPress={() => navigation.navigate("LoginScreen")}>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate("LoginScreen")}>
         <View style={styles.iconWrapper}>
-          <ChevronLeft size={24} />
+          <UserCircle size={24} />
         </View>
-      </Pressable>
+      </TouchableOpacity>
 
       {/* Title + Subtitle */}
       <Text style={styles.title}>Welcome to Wash World</Text>
@@ -158,7 +157,7 @@ export default function RegisterScreen() {
             useNativeAndroidPickerStyle={false}
             Icon={() => (
               <View style={{ top: 0, right: 2, position: "absolute" }}>
-                <ChevronLeft
+                <UserCircle
                   size={20}
                   style={{ transform: [{ rotate: "270deg" }] }}
                   color="#999"
