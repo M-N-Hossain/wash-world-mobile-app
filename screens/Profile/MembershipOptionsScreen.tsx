@@ -1,4 +1,3 @@
-// src/screens/MembershipOptionsScreen.tsx
 import React from "react";
 import {
   View,
@@ -8,128 +7,102 @@ import {
   StyleSheet,
   SafeAreaView,
 } from "react-native";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/store";
+import { useGetSubscriptions } from "../../hooks/useGetSubscriptions";
+import { UserAPI } from "../../APIs/UserAPI";
+
+const planFeatures = {
+  Gold: {
+    price: "139 DKK / month",
+    included: ["Shampoo", "Drying", "Brush washing", "High-pressure flushing", "Wheel wash", "Rinsing wax"],
+    excluded: ["Undercarriage wash", "Polishing", "Insect repellent", "Degreasing", "Foam Splash", "Extra drying"],
+  },
+  Premium: {
+    price: "169 DKK / month",
+    included: [
+      "Shampoo", "Drying", "Brush washing", "High-pressure flushing", "Wheel wash",
+      "Rinsing wax", "Undercarriage wash*", "Polishing"
+    ],
+    excluded: ["Insect repellent", "Degreasing", "Foam Splash", "Extra drying"],
+  },
+  Brilliant: {
+    price: "199 DKK / month",
+    included: [
+      "Shampoo", "Drying", "Brush washing", "High-pressure flushing", "Wheel wash",
+      "Rinsing wax", "Undercarriage wash*", "Polishing", "Insect repellent",
+      "Degreasing", "Foam Splash", "Extra drying"
+    ],
+    excluded: [],
+  },
+};
 
 export default function MembershipOptionsScreen() {
+  const user = useSelector((state: RootState) => state.user.user_profile);
+  const token = useSelector((state: RootState) => state.user.token);
+  const { data: subscriptions, isLoading, isError } = useGetSubscriptions();
+
+  const changeMembership = async (subscriptionId: string) => {
+    console.log("Changing membership to:", subscriptionId);
+    try {
+
+      const response = await UserAPI.updateUserSuscription(subscriptionId, token);
+      console.log("Backend response:", response);
+      // TODO: Dispatch Redux update or local state if needed
+    } catch (error) {
+      console.error("Failed to update user subscription:", error);
+    }
+  };
+
+  const renderPlan = (index: number, label: string) => {
+    if (!subscriptions || !subscriptions[index]) return null;
+
+    const { tierName } = subscriptions[index];
+    const { price, included, excluded } =   planFeatures[label];
+    const isActive = user.subscription === label;
+
+    return (
+      <View key={label} style={styles.card}>
+        <Text style={styles.planTitle}>{tierName}</Text>
+        <Text style={styles.price}>{price}</Text>
+
+        <View style={styles.features}>
+          {included.map((f) => (
+            <Text key={f} style={styles.featureRow}>
+              <Text style={styles.check}>✔︎ </Text>
+              <Text style={styles.featureText}>{f}</Text>
+            </Text>
+          ))}
+          {excluded.map((f) => (
+            <Text key={f} style={[styles.featureRow, styles.disabled]}>
+              <Text style={styles.checkDisabled}>✔︎ </Text>
+              <Text style={styles.featureText}>{f}</Text>
+            </Text>
+          ))}
+        </View>
+
+        {isActive ? (
+          <View style={styles.activeBadge}>
+            <Text style={styles.activeText}>✓ Active</Text>
+          </View>
+        ) : (
+          <TouchableOpacity
+            style={styles.actionRibbon}
+            onPress={() => changeMembership(subscriptions[index].id)}
+          >
+            <Text style={styles.actionText}>Become a member</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    );
+  };
+
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.container}>
-        {/* Back header stub */}
-        {/* <Text style={styles.back}>{"< Back"}</Text> */}
-
-        {/* Gold Plan */}
-        <View style={styles.card}>
-          <Text style={styles.planTitle}>Gold</Text>
-          <Text style={styles.price}>139 DKK / month</Text>
-
-          <View style={styles.features}>
-            {[
-              "Shampoo",
-              "Drying",
-              "Brush washing",
-              "High-pressure flushing",
-              "Wheel wash",
-              "Rinsing wax",
-            ].map((f) => (
-              <Text key={f} style={styles.featureRow}>
-                <Text style={styles.check}>✔︎ </Text>
-                <Text style={styles.featureText}>{f}</Text>
-              </Text>
-            ))}
-
-            {/* disabled features */}
-            {[
-              "Undercarriage wash",
-              "Polishing",
-              "Insect repellent",
-              "Degreasing",
-              "Foam Splash",
-              "Extra drying",
-            ].map((f) => (
-              <Text key={f} style={[styles.featureRow, styles.disabled]}>
-                <Text style={styles.checkDisabled}>✔︎ </Text>
-                <Text style={styles.featureText}>{f}</Text>
-              </Text>
-            ))}
-
-            {/* Active Plan Badge */}
-            <View style={styles.activeBadge}>
-              <Text style={styles.activeText}>✓ Active</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Premium Plan */}
-        <View style={styles.card}>
-          <Text style={styles.planTitle}>Premium</Text>
-          <Text style={styles.price}>169 DKK / month</Text>
-
-          <View style={styles.features}>
-            {[
-              "Shampoo",
-              "Drying",
-              "Brush washing",
-              "High-pressure flushing",
-              "Wheel wash",
-              "Rinsing wax",
-              "Undercarriage wash*",
-              "Polishing",
-            ].map((f) => (
-              <Text key={f} style={styles.featureRow}>
-                <Text style={styles.check}>✔︎ </Text>
-                <Text style={styles.featureText}>{f}</Text>
-              </Text>
-            ))}
-
-            {/* disabled features */}
-            {[
-              "Insect repellent",
-              "Degreasing",
-              "Foam Splash",
-              "Extra drying",
-            ].map((f) => (
-              <Text key={f} style={[styles.featureRow, styles.disabled]}>
-                <Text style={styles.checkDisabled}>✔︎ </Text>
-                <Text style={styles.featureText}>{f}</Text>
-              </Text>
-            ))}
-          </View>
-
-          <TouchableOpacity style={styles.actionRibbon}>
-            <Text style={styles.actionText}>Become a member</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Brilliant Plan */}
-        <View style={styles.card}>
-          <Text style={styles.planTitle}>Brilliant / All inclusive</Text>
-          <Text style={styles.price}>199 DKK / month</Text>
-
-          <View style={styles.features}>
-            {[
-              "Shampoo",
-              "Drying",
-              "Brush washing",
-              "High-pressure flushing",
-              "Wheel wash",
-              "Rinsing wax",
-              "Undercarriage wash*",
-              "Polishing",
-              "Insect repellent",
-              "Degreasing",
-              "Foam Splash",
-              "Extra drying",
-            ].map((f) => (
-              <Text key={f} style={styles.featureRow}>
-                <Text style={styles.check}>✔︎ </Text>
-                <Text style={styles.featureText}>{f}</Text>
-              </Text>
-            ))}
-          </View>
-
-          <TouchableOpacity style={styles.actionRibbon}>
-            <Text style={styles.actionText}>Become a member</Text>
-          </TouchableOpacity>
-        </View>
+        {["Gold", "Premium", "Brilliant"].map((label, index) =>
+          renderPlan(index, label)
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -137,17 +110,7 @@ export default function MembershipOptionsScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#fff", width: "100%" },
-  container: {
-    padding: 20,
-    paddingBottom: 24,
-  },
-  back: {
-    fontSize: 16,
-    color: "#000",
-    marginBottom: 12,
-    marginLeft: 4,
-  },
-
+  container: { padding: 20, paddingBottom: 24 },
   card: {
     backgroundColor: "#fff",
     borderWidth: 1,
@@ -183,16 +146,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#000",
   },
-  check: {
-    color: "#06c167",
-  },
-  checkDisabled: {
-    color: "#ccc",
-  },
-  disabled: {
-    opacity: 0.5,
-  },
-
+  check: { color: "#06c167" },
+  checkDisabled: { color: "#ccc" },
+  disabled: { opacity: 0.5 },
   activeBadge: {
     backgroundColor: "#999999",
     paddingVertical: 12,
@@ -203,7 +159,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: -7,
     bottom: 0,
-    marginTop: 0,
   },
   activeText: {
     color: "#fff",
@@ -211,22 +166,17 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     transform: [{ skewX: "20deg" }],
   },
-
   actionRibbon: {
     backgroundColor: "#06c167",
     paddingVertical: 12,
     paddingHorizontal: 24,
     alignItems: "center",
-    // create the trapezoid cut on the left
     transform: [{ skewX: "-20deg" }],
-
     alignSelf: "flex-end",
     position: "absolute",
     right: -7,
     bottom: 0,
-    marginTop: 0,
   },
-
   actionText: {
     color: "#fff",
     fontSize: 14,
