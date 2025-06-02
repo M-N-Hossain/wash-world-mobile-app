@@ -85,7 +85,8 @@ export default function HomePage() {
         {washesError && (
           <Text>Error fetching washes: {washesError.message}</Text>
         )}
-        {washesData &&
+
+        {washesData?.length > 0 ?  
           washesData
             .slice(0, 2)
             .map(
@@ -100,8 +101,10 @@ export default function HomePage() {
                   date={formatDate(wash.washDatetime)}
                 />
               )
-            )}
-
+            ) : (
+          <Text>No washes registered yet</Text>)            
+          }
+        {/* Link to full wash history */}
         <View style={styles.linkWrapper}>
           <TouchableOpacity
             style={styles.linkButton}
@@ -118,7 +121,7 @@ export default function HomePage() {
         {feedbackError && (
           <Text>Error fetching feedback reports: {feedbackError.message}</Text>
         )}
-        {feedbackData &&
+        { feedbackData?.length > 0 ?
           feedbackData
             .slice(0, 2)
             .map(
@@ -133,6 +136,8 @@ export default function HomePage() {
                   title={feedbackReport.title}
                 />
               )
+            ):(
+            <Text>No feedback reports submitted yet</Text>
             )}
         <View style={styles.linkWrapper}>
           <TouchableOpacity
