@@ -20,16 +20,40 @@ import {
   Sparkles,
   Circle,
   CircleDot,
-  CarIcon,
 } from "lucide-react-native";
+import { washStackParamList } from "../Navigation";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 const CIRCLE_SIZE = 120;
 const COUNTDOWN_SECONDS = 24;
 const PHASE_SECONDS = 4;
 
 const StartWashingScreen = () => {
+  type NavigationProp = NativeStackNavigationProp<
+    washStackParamList,
+    "StartWashingScreen"
+  >;
+  const navigation = useNavigation<NavigationProp>();
+  const route = useRoute();
+  type FeedbackScreenRouteParams = {
+    washId: string;
+    washLocation: string;
+    licensePlate: string;
+  };
+  const { washId, washLocation, licensePlate } =
+    route.params as FeedbackScreenRouteParams;
+
   const [secondsLeft, setSecondsLeft] = useState(COUNTDOWN_SECONDS);
   const animatedValue = useRef(new Animated.Value(0)).current;
+  
+  if (secondsLeft === 0) {
+    navigation.navigate("FeedbackScreen", {
+      washId,
+      washLocation,
+      licensePlate,
+    });
+  }
 
   const activeStep =
     steps.length -
@@ -87,11 +111,11 @@ const StartWashingScreen = () => {
 
       <View style={styles.licenseInfo}>
         <Text style={styles.label}>License Plate</Text>
-        <Text style={styles.plate}>AB 12 345</Text>
-        <Text style={styles.locationTitle}>Ballerup - Industrial Park</Text>
+        <Text style={styles.plate}>{licensePlate}</Text>
+        {/* <Text style={styles.locationTitle}>Ballerup - Industrial Park</Text> */}
         <View style={styles.locationRow}>
           <MapPin size={14} color="black" />
-          <Text style={styles.address}>Industrial Park 6, 2750 Ballerup</Text>
+          <Text style={styles.address}>{washLocation}</Text>
         </View>
       </View>
 

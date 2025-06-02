@@ -32,18 +32,22 @@ export type ProfileStackParamList = {
   MembershipOptionsScreen: undefined;
 };
 
-// This is the type for the Homepage stack
-export type HomepageStackParamList = {
-  Homepage: undefined;
+export type washStackParamList = {
   Locations: undefined;
-  History: undefined;
-  FeedbackScreen: { washLocation: string; washId: unknown };
-  FeedbackReportsScreen: undefined;
   StartWashingScreen: {
-    washId: number;
+    washId: string;
     washLocation: string;
     licensePlate: string;
   };
+  FeedbackScreen: { washId: any; washLocation: string; licensePlate: string };
+};
+
+// This is the type for the Homepage stack
+export type HomepageStackParamList = {
+  Homepage: undefined;
+  History: undefined;
+  FeedbackScreen: { washLocation: string; washId: unknown };
+  FeedbackReportsScreen: undefined;
 };
 
 // This is the type for the Auth stack
@@ -101,6 +105,37 @@ function AuthStack() {
 const ProfileStackNavigator =
   createNativeStackNavigator<ProfileStackParamList>();
 
+// Wash stack
+const WashStackNavigator = createNativeStackNavigator<washStackParamList>();
+
+function WashStack() {
+  return (
+    <WashStackNavigator.Navigator>
+      <WashStackNavigator.Screen
+        name="Locations"
+        component={Locations}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <WashStackNavigator.Screen
+        name="StartWashingScreen"
+        component={StartWashingScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <WashStackNavigator.Screen
+        name="FeedbackScreen"
+        component={FeedbackScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+    </WashStackNavigator.Navigator>
+  );
+}
+
 function ProfileStack() {
   return (
     <ProfileStackNavigator.Navigator>
@@ -130,11 +165,6 @@ function HomepageStack() {
   return (
     <HomepageStackNavigator.Navigator screenOptions={{ headerShown: false }}>
       <HomepageStackNavigator.Screen name="Homepage" component={HomePage} />
-      <HomepageStackNavigator.Screen name="Locations" component={Locations} />
-      <HomepageStackNavigator.Screen
-        name="StartWashingScreen"
-        component={StartWashingScreen}
-      />
       <HomepageStackNavigator.Screen
         name="FeedbackScreen"
         component={FeedbackScreen}
@@ -165,6 +195,10 @@ function HomepageStack() {
           headerTintColor: "#fff",
         }}
       />
+      {/* <HomepageStackNavigator.Screen
+        name="FeedbackReportsScreen"
+        component={WashStack}
+      /> */}
     </HomepageStackNavigator.Navigator>
   );
 }
@@ -192,7 +226,7 @@ function BasicTabs() {
       />
       <Tab.Screen
         name="Locations"
-        component={Locations}
+        component={WashStack}
         options={{
           tabBarIcon: ({ focused }) => (
             <MapPin color={focused ? "#0ac267" : "#666666"} />
