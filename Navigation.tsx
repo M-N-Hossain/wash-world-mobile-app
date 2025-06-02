@@ -1,5 +1,5 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, useNavigationState } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as SecureStore from "expo-secure-store";
 import { House, MapPin, User } from "lucide-react-native";
@@ -16,8 +16,11 @@ import RegisterScreen from "./screens/Auth/Register";
 import History from "./screens/History";
 import HomePage from "./screens/HomePage";
 import Locations from "./screens/locations";
+import OnboardingScreen from "./screens/Onboarding/OnboardingScreen";
 import MembershipOptionsScreen from "./screens/Profile/MembershipOptionsScreen";
 import ProfileScreen from "./screens/Profile/ProfileScreen";
+import FeedbackScreen from "./screens/Feedback";
+import FeedbackReportsScreen from "./screens/FeedbackReports";
 
 // This is the type for the Profile stack
 export type ProfileStackParamList = {
@@ -30,28 +33,35 @@ export type HomepageStackParamList = {
   Homepage: undefined;
   Locations: undefined;
   History: undefined;
+  FeedbackScreen: { washLocation: string; washId: unknown };
+  FeedbackReportsScreen: undefined
 };
 
 // This is the type for the Auth stack
 export type AuthStackParamList = {
   LoginScreen: undefined;
   RegisterScreen: undefined;
-  OnboardingScreen: undefined;
+  OnboardingScreen: {
+    registrationData?: {
+      email: string;
+      password: string;
+    };
+  };
 };
 
 // Auth stack
 const AuthStackNavigator = createNativeStackNavigator<AuthStackParamList>();
 
 function AuthStack() {
+
+  const currentRoute = useNavigationState(
+    (state) => state?.routes?.[state.index]?.name
+  );
+  
+  console.log("Current route:", currentRoute);
+  
   return (
     <AuthStackNavigator.Navigator>
-      {/* <AuthStackNavigator.Screen
-        name="OnboardingScreen"
-        component={OnboardingScreen}
-        options={{
-          headerShown: false,
-        }}
-      /> */}
       <AuthStackNavigator.Screen
         name="LoginScreen"
         component={LoginScreen}
@@ -65,6 +75,13 @@ function AuthStack() {
         component={RegisterScreen}
         options={{
           title: "Register",
+          headerShown: false,
+        }}
+      />
+      <AuthStackNavigator.Screen
+        name="OnboardingScreen"
+        component={OnboardingScreen}
+        options={{
           headerShown: false,
         }}
       />
@@ -106,6 +123,26 @@ function HomepageStack() {
     <HomepageStackNavigator.Navigator screenOptions={{ headerShown: false }}>
       <HomepageStackNavigator.Screen name="Homepage" component={HomePage} />
       <HomepageStackNavigator.Screen name="Locations" component={Locations} />
+      <HomepageStackNavigator.Screen
+        name="FeedbackScreen"
+        component={FeedbackScreen}
+        options={{
+          title: "Feedback",
+          headerShown: true,
+          headerStyle: { backgroundColor: "#0ac267" },
+          headerTintColor: "#fff",
+        }}
+      />
+      <HomepageStackNavigator.Screen
+        name="FeedbackReportsScreen"
+        component={FeedbackReportsScreen}
+        options={{
+          title: "Feedback reports",
+          headerShown: true,
+          headerStyle: { backgroundColor: "#0ac267" },
+          headerTintColor: "#fff",
+        }}
+      />
       <HomepageStackNavigator.Screen
         name="History"
         component={History}
@@ -164,6 +201,7 @@ function BasicTabs() {
 }
 
 export default function Navigation() {
+  
   const token = useSelector((state: RootState) => state.user.token);
   const isLoadingUser = useSelector(
     (state: RootState) => state.user.isLoadingUser
@@ -177,18 +215,21 @@ export default function Navigation() {
     exp: number;
   };
 
+  
+
+
   // Check for token expiration on app load
   useEffect(() => {
     const checkTokenExpiration = async () => {
       try {
         const stored = await SecureStore.getItemAsync("jwt");
-        
+
         if (!stored) {
           // No token found in storage
           dispatch(logout());
           return;
         }
-        
+
         try {
           // Parse the token correctly - it's stored as a plain string
           const decoded: DecodedToken = jwtDecode(stored);
@@ -202,7 +243,7 @@ export default function Navigation() {
             dispatch(logout());
             return;
           }
-          
+
           // If token is valid but we don't have it in Redux, load it
           if (!token && timeUntilExpiry > 0) {
             dispatch(reloadJwtFromStorage(stored));

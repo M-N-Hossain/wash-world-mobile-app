@@ -6,20 +6,23 @@ import axiosInstance from "../utils/axiosInterceptor";
 import Constants from "expo-constants";
 
 const API_URL = Constants.expoConfig?.extra?.API_URL;
-    type DecodedToken = {
-      email: string;
-      exp: number;
-      iat: number;
-      licensePlate: string;
-      subscriptionId: string;
-      id: string;
-    };
+type DecodedToken = {
+  email: string;
+  exp: number;
+  iat: number;
+  licensePlate: string;
+  subscriptionId: string;
+  id: string;
+};
 export class UserAPI {
-  static API_URL = API_URL
+  static API_URL = API_URL;
 
   static async loginUser(userDto: LoginUserDto) {
     try {
-      const response = await axiosInstance.post(`${this.API_URL}/auth/login`, userDto);
+      const response = await axiosInstance.post(
+        `${this.API_URL}/auth/login`,
+        userDto
+      );
       // console.log("Full response from backend:", response.data);
       return response.data;
     } catch (error) {
@@ -29,7 +32,10 @@ export class UserAPI {
   }
   static async signupUser(userDto: CreateUserDto) {
     try {
-      const response = await axiosInstance.post(`${this.API_URL}/auth/signup`, userDto);
+      const response = await axiosInstance.post(
+        `${this.API_URL}/auth/signup`,
+        userDto
+      );
       return response.data;
     } catch (error) {
       console.error("Error signing up user:", error);
@@ -38,14 +44,18 @@ export class UserAPI {
   }
 
   static async getUserById(token: string) {
-    
+    console.log(API_URL);
+
     try {
       const decodedToken = jwtDecode(token) as DecodedToken;
-      const response = await axiosInstance.get(`${this.API_URL}/api/users/${decodedToken.id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axiosInstance.get(
+        `${this.API_URL}/api/users/${decodedToken.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       return response.data;
     } catch (error) {
       console.error("Error fetching user by ID:", error);
