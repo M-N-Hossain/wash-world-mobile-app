@@ -46,14 +46,22 @@ const StartWashingScreen = () => {
 
   const [secondsLeft, setSecondsLeft] = useState(COUNTDOWN_SECONDS);
   const animatedValue = useRef(new Animated.Value(0)).current;
-  
-  if (secondsLeft === 0) {
+
+  // if (secondsLeft === 0) {
+  //   navigation.navigate("FeedbackScreen", {
+  //     washId,
+  //     washLocation,
+  //     licensePlate,
+  //   });
+  // }
+
+  const timeout = setTimeout(() => {
     navigation.navigate("FeedbackScreen", {
       washId,
       washLocation,
       licensePlate,
     });
-  }
+  }, COUNTDOWN_SECONDS * 1000);
 
   const activeStep =
     steps.length -
