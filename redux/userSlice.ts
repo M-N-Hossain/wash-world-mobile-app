@@ -106,8 +106,9 @@ const userSlice = createSlice({
     },
     updateUserProfile: (state, action) => {
       state.user_profile = {
-        ...state.user_profile, 
-        ...action.payload
+        ...state.user_profile,
+        ...action.payload,
+        subscription: action.payload.subscription.tierName
       };
     }
   },
