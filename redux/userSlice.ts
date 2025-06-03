@@ -29,7 +29,7 @@ export const login = createAsyncThunk(
     // Save the token securely immediately - store as plain string
     await SecureStore.deleteItemAsync("jwt");
     await SecureStore.setItemAsync("jwt", token);
-
+    
     await thunkApi.dispatch(getUser(token));
 
     return { token };
