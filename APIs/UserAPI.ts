@@ -4,7 +4,6 @@ import { LoginUserDto } from "../redux/LoginUserDto";
 import axiosInstance from "../utils/axiosInterceptor";
 
 import Constants from "expo-constants";
-import { use } from "react";
 
 const API_URL = Constants.expoConfig?.extra?.API_URL;
 type DecodedToken = {
@@ -84,8 +83,8 @@ export class UserAPI {
   static async updateUserSuscription(subscriptionId: string, token: string) {
     try {
       const response = await axiosInstance.put(
-        `${this.API_URL}/api/users/subscription`,
-        { subscriptionId },
+        `${API_URL}/api/users/change-subscription`,
+        { subscriptionId }, 
         {
           headers: {
             Authorization: `Bearer ${token}`,

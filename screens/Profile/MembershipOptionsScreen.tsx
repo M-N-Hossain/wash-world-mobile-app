@@ -1,16 +1,17 @@
 import React from "react";
 import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
   SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { useSelector } from "react-redux";
-import { RootState } from "../../store/store";
-import { useGetSubscriptions } from "../../hooks/useGetSubscriptions";
+import { useDispatch, useSelector } from "react-redux";
 import { UserAPI } from "../../APIs/UserAPI";
+import { useGetSubscriptions } from "../../hooks/useGetSubscriptions";
+import { updateUserProfile } from "../../redux/userSlice";
+import { AppDispatch, RootState } from "../../store/store";
 
 const planFeatures = {
   Gold: {
@@ -41,6 +42,9 @@ export default function MembershipOptionsScreen() {
   const user = useSelector((state: RootState) => state.user.user_profile);
   const token = useSelector((state: RootState) => state.user.token);
   const { data: subscriptions, isLoading, isError } = useGetSubscriptions();
+  const dispatch = useDispatch<AppDispatch>();
+
+
 
   const changeMembership = async (subscriptionId: string) => {
     console.log("Changing membership to:", subscriptionId);
@@ -48,6 +52,8 @@ export default function MembershipOptionsScreen() {
 
       const response = await UserAPI.updateUserSuscription(subscriptionId, token);
       console.log("Backend response:", response);
+      dispatch(updateUserProfile(response));
+      
       // TODO: Dispatch Redux update or local state if needed
     } catch (error) {
       console.error("Failed to update user subscription:", error);
@@ -58,7 +64,7 @@ export default function MembershipOptionsScreen() {
     if (!subscriptions || !subscriptions[index]) return null;
 
     const { tierName } = subscriptions[index];
-    const { price, included, excluded } =   planFeatures[label];
+    const { price, included, excluded } = planFeatures[label as keyof typeof planFeatures];
     const isActive = user.subscription === label;
 
     return (
@@ -67,13 +73,13 @@ export default function MembershipOptionsScreen() {
         <Text style={styles.price}>{price}</Text>
 
         <View style={styles.features}>
-          {included.map((f) => (
+          {included.map((f: string) => (
             <Text key={f} style={styles.featureRow}>
               <Text style={styles.check}>✔︎ </Text>
               <Text style={styles.featureText}>{f}</Text>
             </Text>
           ))}
-          {excluded.map((f) => (
+          {excluded.map((f: string) => (
             <Text key={f} style={[styles.featureRow, styles.disabled]}>
               <Text style={styles.checkDisabled}>✔︎ </Text>
               <Text style={styles.featureText}>{f}</Text>
