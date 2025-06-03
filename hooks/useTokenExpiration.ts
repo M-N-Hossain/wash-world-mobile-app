@@ -9,10 +9,7 @@ type DecodedToken = {
   exp: number;
 };
 
-/**
- * A hook to check if the token is expired and handle token expiration
- * Can be used in components that need to verify token validity
- */
+
 export const useTokenExpiration = () => {
   const dispatch = useDispatch<AppDispatch>();
   const token = useSelector((state: RootState) => state.user.token);
@@ -27,17 +24,13 @@ export const useTokenExpiration = () => {
       }
       
       try {
-        // Parse token correctly - it's stored as a plain string
         const decoded: DecodedToken = jwtDecode(stored);
-        const now = Math.floor(Date.now() / 1000); // current time in seconds
-        
+        const now = Math.floor(Date.now() / 1000); 
         return decoded.exp <= now;
       } catch (decodeError) {
-        console.error('Error decoding token:', decodeError);
         return true;
       }
     } catch (err) {
-      console.error('Error checking token expiration:', err);
       return true;
     }
   };
@@ -46,14 +39,12 @@ export const useTokenExpiration = () => {
   const handleExpiredToken = async () => {
     try {
       if (await isTokenExpired()) {
-        console.log('Token is expired, logging out');
         await SecureStore.deleteItemAsync('jwt');
         dispatch(logout());
         return true;
       }
       return false;
     } catch (error) {
-      console.error('Error handling expired token:', error);
       dispatch(logout());
       return true;
     }
@@ -63,7 +54,7 @@ export const useTokenExpiration = () => {
   useEffect(() => {
     handleExpiredToken();
     
-    // Also set up a regular check (every minute)
+    // set up a regular check (every minute)
     const intervalId = setInterval(() => {
       handleExpiredToken();
     }, 60000);
@@ -76,7 +67,6 @@ export const useTokenExpiration = () => {
   return {
     isTokenExpired,
     handleExpiredToken,
-    // Convenience method to check before any sensitive operation
     checkTokenBeforeAction: async (callback: () => void) => {
       const expired = await handleExpiredToken();
       if (!expired && callback) {

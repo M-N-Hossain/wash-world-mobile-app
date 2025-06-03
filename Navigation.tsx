@@ -53,12 +53,6 @@ export type AuthStackParamList = {
 const AuthStackNavigator = createNativeStackNavigator<AuthStackParamList>();
 
 function AuthStack() {
-
-  const currentRoute = useNavigationState(
-    (state) => state?.routes?.[state.index]?.name
-  );
-  
-  console.log("Current route:", currentRoute);
   
   return (
     <AuthStackNavigator.Navigator>
@@ -201,7 +195,6 @@ function BasicTabs() {
 }
 
 export default function Navigation() {
-  
   const token = useSelector((state: RootState) => state.user.token);
   const isLoadingUser = useSelector(
     (state: RootState) => state.user.isLoadingUser
@@ -231,9 +224,8 @@ export default function Navigation() {
         }
 
         try {
-          // Parse the token correctly - it's stored as a plain string
           const decoded: DecodedToken = jwtDecode(stored);
-          const now = Math.floor(Date.now() / 1000); // current time in seconds
+          const now = Math.floor(Date.now() / 1000); 
           const timeUntilExpiry = decoded.exp - now;
 
           // If token is expired, log out immediately
@@ -244,7 +236,6 @@ export default function Navigation() {
             return;
           }
 
-          // If token is valid but we don't have it in Redux, load it
           if (!token && timeUntilExpiry > 0) {
             dispatch(reloadJwtFromStorage(stored));
             dispatch(getUser(stored));

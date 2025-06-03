@@ -18,6 +18,13 @@ import { useGetSubscriptions } from "../../hooks/useGetSubscriptions";
 import { AuthStackParamList } from "../../Navigation";
 import { AppDispatch } from "../../store/store";
 
+
+
+type NavigationProp = NativeStackNavigationProp<
+AuthStackParamList,
+"OnboardingScreen"
+>;
+
 export default function RegisterScreen() {
   const dispatch = useDispatch<AppDispatch>();
   const navigation = useNavigation<NavigationProp>();
@@ -31,10 +38,8 @@ export default function RegisterScreen() {
   const [isRegistering, setIsRegistering] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState("");
 
-  type NavigationProp = NativeStackNavigationProp<
-  AuthStackParamList,
-  "OnboardingScreen"
->;
+  // Get subscriptions
+  const { isLoading, isError, data, error } = useGetSubscriptions();
 
   // Handle register action
   const handleRegister = async () => {
@@ -67,8 +72,7 @@ export default function RegisterScreen() {
     }
   };
 
-  const { isLoading, isError, data, error } = useGetSubscriptions();
-  console.log("Subscriptions data:", data);
+
 
   return (
     <SafeAreaView style={styles.container}>

@@ -21,17 +21,17 @@ import { formatDate } from "../utils/formatDate";
 import FeedbackReportCard from "../components/FeedbackReportCard";
 import { useGetFeedbackReports } from "../hooks/useGetFeedbackReports";
 
-export default function HomePage() {
-  type NavigationProp = NativeStackNavigationProp<
-    HomepageStackParamList,
-    "Homepage"
-  >;
+type NavigationProp = NativeStackNavigationProp<
+  HomepageStackParamList,
+  "Homepage"
+>;
 
+
+export default function HomePage() {
   const navigation = useNavigation<NavigationProp>();
   const { checkTokenBeforeAction } = useTokenExpiration();
 
   const handleFeedbackPress = () => {
-    // console.log("See all feedback reports");
     checkTokenBeforeAction(() => {
       navigation.navigate("FeedbackReportsScreen");
     });
@@ -55,7 +55,6 @@ export default function HomePage() {
     data: feedbackData,
   } = useGetFeedbackReports(user.id);
 
-  // Check token on component mount
   useEffect(() => {
     const validateToken = async () => {
       await checkTokenBeforeAction(() => {

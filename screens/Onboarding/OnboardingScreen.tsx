@@ -16,7 +16,7 @@ const OnboardingScreen = () => {
   // Prevent back button from working on Android
   useEffect(() => {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-      return true; // Prevent default behavior (going back)
+      return true; 
     });
 
     return () => backHandler.remove();
@@ -37,22 +37,18 @@ const OnboardingScreen = () => {
   );
   const userData = route?.params?.registrationData;
   
-  console.log("OnboardingScreen - userData:", userData);
+
 
   const goToHomeScreen = async () => {
     try {
-      console.log("Attempting to go to home screen with userData:", userData);
+
       // If we have registration data, use it to log in automatically
       if (userData?.email && userData?.password) {
-        console.log("Logging in with:", userData.email);
         await dispatch(login({
           email: userData.email,
           password: userData.password
         }));
-        console.log("Login dispatched successfully");
-        // The Navigation component will handle redirecting to home screen once logged in
-      } else {
-        console.log("No user data, redirecting to login");
+        } else {
         // Fallback to login screen if no registration data
         navigation.reset({
           index: 0,

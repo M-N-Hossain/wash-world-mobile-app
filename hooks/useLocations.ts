@@ -22,7 +22,7 @@ export const useLocations = () => {
     try {
       const response = await LocationAPI.getLocations();
       setLocations(response);
-      //   console.log("Locations fetched:", response.data);
+      
     } catch (error) {
       console.error("Error fetching locations:", error);
     }

@@ -17,8 +17,6 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { AuthStackParamList } from "../../Navigation";
 
-export default function LoginScreen() {
-  const dispatch = useDispatch<AppDispatch>();
 
   // Navigation
   type NavigationProp = NativeStackNavigationProp<
@@ -26,6 +24,9 @@ export default function LoginScreen() {
     "LoginScreen"
   >;
 
+
+export default function LoginScreen() {
+  const dispatch = useDispatch<AppDispatch>();
   const navigation = useNavigation<NavigationProp>();
 
   const [email, setEmail] = React.useState("");
@@ -33,14 +34,7 @@ export default function LoginScreen() {
 
   // Handle login action
   const handleLogin = () => {
-    // console.log("Login button pressed");
     dispatch(login(new LoginUserDto(email, password)));
-  };
-
-  // Handle register action
-  const handleRegister = () => {
-    // console.log("Register button pressed");
-    navigation.navigate("RegisterScreen");
   };
 
   return (

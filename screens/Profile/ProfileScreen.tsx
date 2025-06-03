@@ -2,12 +2,12 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import React, { useEffect, useState } from "react";
 import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { UserAPI } from "../../APIs/UserAPI";
@@ -19,11 +19,13 @@ import { useTokenExpiration } from "../../hooks/useTokenExpiration";
 import { updateUserProfile } from "../../redux/userSlice";
 import { AppDispatch, RootState } from "../../store/store";
 
+type NavigationProp = NativeStackNavigationProp<
+  ProfileStackParamList,
+  "ProfileScreen"
+>;
+
+
 export default function ProfileScreen() {
-  type NavigationProp = NativeStackNavigationProp<
-    ProfileStackParamList,
-    "ProfileScreen"
-  >;
   const navigation = useNavigation<NavigationProp>();
   const { checkTokenBeforeAction, handleExpiredToken } = useTokenExpiration();
 
@@ -53,11 +55,6 @@ export default function ProfileScreen() {
   const user = useSelector((state: RootState) => state.user.user_profile);
   const token = useSelector((state: RootState) => state.user.token);
 
-  /*   // Local state initialized empty — will be set from Redux user data
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
-    const [email, setEmail] = useState("");
-    const [licensePlate, setLicensePlate] = useState(""); */
 
   const [userData, setUserData] = useState({
     firstName: "",
@@ -104,10 +101,8 @@ export default function ProfileScreen() {
       };
 
       try {
-        // We will add the api call to update user profile directly in the UserAPI file when we merge this branch into dev
-        // Call backend update
+      
         const response = await UserAPI.updateUserProfile(token, userToUpdateData);
-        console.log("Backend response:", response);
         setUserData(response); // Update local state with response data
         dispatch(updateUserProfile(response)); // Dispatch action to update Redux store
         // Show success alert

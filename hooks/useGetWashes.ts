@@ -26,7 +26,7 @@ export const useGetWashes = (id: number) => {
         "Content-Type": "application/json",
       },
     });
-    // console.log(`Fetched washes for user ID ${id}`, response.data);
+    
 
     return response.data;
   };
