@@ -68,7 +68,7 @@ const FeedbackScreen = () => {
         Alert.alert("Thank you!", "Your feedback has been submitted.");
         navigation.reset({
           index: 0,
-          routes: [{ name: "Locations" }], // Replace "Homepage" with the desired screen
+          routes: [{ name: "Locations" }], 
         });
       },
       onError: () => {

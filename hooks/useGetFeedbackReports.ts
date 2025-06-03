@@ -25,7 +25,6 @@ export const useGetFeedbackReports = (id: number) => {
         "Content-Type": "application/json",
       },
     });
-    // console.log(`Fetched reports for user ID ${id}`, response.data);
 
     return response.data;
   };
