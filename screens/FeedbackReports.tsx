@@ -25,7 +25,9 @@ export default function FeedbackReportsScreen() {
           <Text>Error fetching feedback reports: {feedbackError.message}</Text>
         )}
         {feedbackData &&
-          feedbackData.map(
+          feedbackData
+          .reverse()
+          .map(
             (feedbackReport: {
               id: React.Key;
               rating: string;

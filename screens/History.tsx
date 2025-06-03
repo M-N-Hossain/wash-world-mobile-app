@@ -20,7 +20,10 @@ export default function History() {
 
   const handleReportFeedback = (washLocation: string, id: unknown) => {
     console.log("hi from");
-    navigation.navigate("FeedbackScreen", { washLocation: washLocation, washId: id });
+    navigation.navigate("FeedbackScreen", {
+      washLocation: washLocation,
+      washId: id,
+    });
   };
 
   return (
@@ -38,22 +41,24 @@ export default function History() {
         {isLoading && <Text>Loading...</Text>}
         {error && <Text>Error: {error.message}</Text>}
         {data &&
-          data.map(
-            (wash: {
-              id: React.Key;
-              washLocation: string;
-              washDatetime: string;
-            }) => (
-              <WashCard
-                key={wash.id}
-                name={wash.washLocation}
-                date={formatDate(wash.washDatetime)}
-                onReportIssue={() =>
-                  handleReportFeedback(wash.washLocation, wash.id)
-                }
-              />
-            )
-          )}
+          data
+            .reverse()
+            .map(
+              (wash: {
+                id: React.Key;
+                washLocation: string;
+                washDatetime: string;
+              }) => (
+                <WashCard
+                  key={wash.id}
+                  name={wash.washLocation}
+                  date={formatDate(wash.washDatetime)}
+                  onReportIssue={() =>
+                    handleReportFeedback(wash.washLocation, wash.id)
+                  }
+                />
+              )
+            )}
       </ScrollView>
     </View>
   );

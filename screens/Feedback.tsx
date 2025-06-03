@@ -9,11 +9,13 @@ import {
   Alert,
 } from "react-native";
 import { Star } from "lucide-react-native";
-import { useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { useRegisterFeedback } from "../hooks/useRegisterFeedback";
 import { Feedback } from "../entities/RegisterFeedback";
+import { washStackParamList } from "../Navigation";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 const reasonsList = [
   "Location",
@@ -29,6 +31,11 @@ type FeedbackScreenRouteParams = {
 };
 
 const FeedbackScreen = () => {
+  type NavigationProp = NativeStackNavigationProp<
+    washStackParamList,
+    "StartWashingScreen"
+  >;
+  const navigation = useNavigation<NavigationProp>();
   const route = useRoute();
   const { washLocation, washId } = (route.params ||
     {}) as FeedbackScreenRouteParams;
@@ -59,11 +66,17 @@ const FeedbackScreen = () => {
     registerFeedback(feedback, {
       onSuccess: () => {
         Alert.alert("Thank you!", "Your feedback has been submitted.");
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "Locations" }], // Replace "Homepage" with the desired screen
+        });
       },
       onError: () => {
-        Alert.alert("There has been a problem with your feedback report, please try again later");
-        console.error("Error registering feedback:", error)
-      }
+        Alert.alert(
+          "There has been a problem with your feedback report, please try again later"
+        );
+        console.error("Error registering feedback:", error);
+      },
     });
   };
 
